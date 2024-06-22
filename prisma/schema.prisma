@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Ticket {
+  id Int @id @default(autoincrement())
+  title String @db.VarChar(255)
+  description String @db.Text
+  status Status @default(OPEN)
+  priority Priority @default(MEDIUM)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  assignedToUserId Int?
+  assignedToUser User? @relation(fields: [assignedToUserId], references: [id])
+  projectId Int?
+  project Project? @relation(fields: [projectId], references: [id])
+}
+
+enum Status {
+  OPEN
+  STARTED
+  CLOSED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  name String
+  username String @unique
+  password String
+  role Role @default(USER)
+  assignedTickets Ticket[]
+  projects Project[] @relation("UserProjects")
+}
+
+enum Role {
+  ADMIN 
+  TECH
+  USER
+}
+
+model Project {
+  id Int @id @default(autoincrement())
+  name String
+  description String @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tickets Ticket[]
+  users User[] @relation("UserProjects")
+}
