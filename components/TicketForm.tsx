@@ -20,14 +20,15 @@ import {
 import { Button } from "./ui/button";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Ticket } from "@prisma/client";
+import { Project, Ticket } from "@prisma/client";
 
 type TicketFormData = z.infer<typeof ticketSchema>;
 
 interface Props {
   ticket?: Ticket;
+  project: Project;
 }
-const TicketForm = ({ ticket }: Props) => {
+const TicketForm = ({ ticket, project }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -84,6 +85,36 @@ const TicketForm = ({ ticket }: Props) => {
               <SimpleMDE placeholder="Description" {...field} />
             )}
           />
+          {/* <div className="flex w-full space-x-12">
+            <FormField
+              control={form.control}
+              name="project"
+              defaultValue={project.name}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Project</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder="Project..."
+                          defaultValue={project.name}
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="OPEN">Open</SelectItem>
+                      <SelectItem value="STARTED">Started</SelectItem>
+                      <SelectItem value="CLOSED">Closed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+          </div> */}
           <div className="flex w-full space-x-4">
             <FormField
               control={form.control}

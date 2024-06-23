@@ -1,9 +1,16 @@
 import DashChart from "@/components/DashChart";
 import DashRecentTickets from "@/components/DashRecentTickets";
 import prisma from "@/prisma/db";
+import { getServerSession } from "next-auth";
 import React from "react";
+import options from "./api/auth/[...nextauth]/options";
 
 const Dashboard = async () => {
+  const session = await getServerSession(options);
+
+  if (!session) {
+    return <p className="text-destructive">Login required</p>;
+  }
   const tickets = await prisma.ticket.findMany({
     where: {
       NOT: [{ status: "CLOSED" }],

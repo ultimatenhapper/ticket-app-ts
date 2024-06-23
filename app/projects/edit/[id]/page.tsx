@@ -7,24 +7,24 @@ import React from "react";
 interface Props {
   params: { id: string };
 }
-const TicketForm = dynamic(() => import("@/components/TicketForm"), {
+const ProjectForm = dynamic(() => import("@/components/ProjectForm"), {
   ssr: false,
 });
 
-const EditTicket = async ({ params }: Props) => {
+const EditProject = async ({ params }: Props) => {
   const session = await getServerSession(options);
 
   if (!session) {
     return <p className="text-destructive">Login required</p>;
   }
-  const ticket = await prisma?.ticket.findUnique({
+  const project = await prisma.project.findUnique({
     where: { id: parseInt(params.id) },
   });
 
-  if (!ticket) {
-    return <p className="text-destructive">Ticket not found</p>;
+  if (!project) {
+    return <p className="text-destructive">Project not found</p>;
   }
-  return <TicketForm ticket={ticket} />;
+  return <ProjectForm project={project} />;
 };
 
-export default EditTicket;
+export default EditProject;

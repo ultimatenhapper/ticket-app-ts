@@ -1,6 +1,4 @@
 import Markdown from "react-markdown";
-import TicketPriority from "@/components/TicketPriority";
-import TicketStatusBadge from "@/components/TicketStatusBadge";
 import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
@@ -10,30 +8,27 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Ticket, User } from "@prisma/client";
+import { Project, User } from "@prisma/client";
 import Link from "next/link";
 import React from "react";
 import DeleteButton from "./DeleteButton";
-import AssignTicket from "@/components/AssignTicket";
+import AssignProject from "@/components/AssignProject";
+import { Progress } from "@/components/ui/progress";
 
 interface Props {
-  ticket: Ticket;
+  project: Project;
   users: User[];
 }
 
-const TicketDetail = ({ ticket, users }: Props) => {
+const ProjectDetail = ({ project, users }: Props) => {
   return (
     <div className="lg:grid lg:grid-cols-4">
       <Card className="mx-4 mb-4 lg:col-span-3 lg:mr-4">
         <CardHeader>
-          <div className="flex justify-between mb-3">
-            <TicketStatusBadge status={ticket.status} />
-            <TicketPriority priority={ticket.priority} />
-          </div>
-          <CardTitle>{ticket.title}</CardTitle>
+          <CardTitle>{project.name}</CardTitle>
           <CardDescription>
             Created:{" "}
-            {ticket.createdAt.toLocaleDateString("en-ES", {
+            {project.createdAt.toLocaleDateString("en-ES", {
               year: "2-digit",
               month: "2-digit",
               day: "2-digit",
@@ -44,10 +39,11 @@ const TicketDetail = ({ ticket, users }: Props) => {
           </CardDescription>
         </CardHeader>
         <CardContent className="prose dark:prose-invert">
-          <Markdown>{ticket.description}</Markdown>
+          <Markdown>{project.description}</Markdown>
+          <Progress value={50} />
         </CardContent>
         <CardFooter>
-          {ticket.updatedAt.toLocaleDateString("en-ES", {
+          {project.updatedAt.toLocaleDateString("en-ES", {
             year: "2-digit",
             month: "2-digit",
             day: "2-digit",
@@ -58,19 +54,25 @@ const TicketDetail = ({ ticket, users }: Props) => {
         </CardFooter>
       </Card>
       <div className="mx-4 flex lg:flex-col lg:mx-0 gap-2">
-        <AssignTicket ticket={ticket} users={users} />
+        {/* <AssignProject project={project} users={users} /> */}
         <Link
-          href={`/tickets/edit/${ticket.id}`}
+          href="/tickets/new"
+          className={buttonVariants({ variant: "secondary" })}
+        >
+          New Ticket
+        </Link>
+        <Link
+          href={`/projects/edit/${project.id}`}
           className={`${buttonVariants({
             variant: "default",
           })}`}
         >
-          Edit Ticket
+          Edit Project
         </Link>
-        <DeleteButton ticketId={ticket.id} />
+        <DeleteButton projectId={project.id} />
       </div>
     </div>
   );
 };
 
-export default TicketDetail;
+export default ProjectDetail;

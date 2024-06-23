@@ -1,28 +1,28 @@
 import React from "react";
 import prisma from "@/prisma/db";
-import TicketDetail from "@/app/api/tickets/[id]/TicketDetail";
+import ProjectDetail from "@/app/api/projects/[id]/ProjectDetail";
 import { getServerSession } from "next-auth";
 import options from "@/app/api/auth/[...nextauth]/options";
 
 interface Props {
   params: { id: string };
 }
-const ViewTicket = async ({ params }: Props) => {
+const ViewProject = async ({ params }: Props) => {
   const session = await getServerSession(options);
 
   if (!session) {
     return <p className="text-destructive">Login required</p>;
   }
-  const ticket = await prisma.ticket.findUnique({
+  const project = await prisma.project.findUnique({
     where: { id: parseInt(params.id) },
   });
 
   const users = await prisma.user.findMany();
 
-  if (!ticket) {
-    return <p className="text-destructive">Ticket not found!</p>;
+  if (!project) {
+    return <p className="text-destructive">Project not found!</p>;
   }
-  return <TicketDetail ticket={ticket} users={users} />;
+  return <ProjectDetail project={project} users={users} />;
 };
 
-export default ViewTicket;
+export default ViewProject;

@@ -11,6 +11,11 @@ const MainNavLinks = ({ role }: { role?: string }) => {
       adminOnly: false,
     },
     {
+      label: "Projects",
+      href: "/projects",
+      adminOnly: false,
+    },
+    {
       label: "Tickets",
       href: "/tickets",
       adminOnly: false,
@@ -34,7 +39,7 @@ const MainNavLinks = ({ role }: { role?: string }) => {
             href={link.href}
             className={`navbar-link ${
               currentPath == link.href &&
-              "cursor-default text-primary/70 hover:text-primary/60"
+              "cursor-default text-3xl text-primary/70 hover:text-primary/60"
             }`}
           >
             {link.label}
