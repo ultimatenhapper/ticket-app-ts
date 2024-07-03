@@ -3,16 +3,21 @@ import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import { ProjectGrid } from "./ProjectGrid";
 import { getServerSession } from "next-auth";
-import options from "../api/auth/[...nextauth]/options";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 
 const Projects = async () => {
-  const session = await getServerSession(options);
+  const session = await getServerSession(authOptions);
 
   if (!session) {
     return <p className="text-destructive">Login required</p>;
   }
 
-  const projects = await prisma.project.findMany();
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    include: { projects: true },
+  });
+
+  const projects = user?.projects;
 
   return (
     <div className="relative">
@@ -25,7 +30,13 @@ const Projects = async () => {
         </Link>
       </div>
       <div className="flex items-center justify-center mt-8">
-        <ProjectGrid projects={projects} />
+        {projects && projects.length > 0 ? (
+          <ProjectGrid projects={projects} />
+        ) : (
+          <p className="text-3xl items-center align-middle">
+            No projects assigned to {session.user.name}
+          </p>
+        )}
       </div>
     </div>
   );

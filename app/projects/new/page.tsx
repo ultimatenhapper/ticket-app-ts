@@ -1,4 +1,4 @@
-import options from "@/app/api/auth/[...nextauth]/options";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
 import dynamic from "next/dynamic";
 import React from "react";
@@ -8,7 +8,7 @@ const ProjectForm = dynamic(() => import("@/components/ProjectForm"), {
 });
 
 const NewTicket = async () => {
-  const session = await getServerSession(options);
+  const session = await getServerSession(authOptions);
 
   if (!session) {
     return <p className="text-destructive">Login required</p>;

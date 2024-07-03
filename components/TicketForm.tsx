@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "./ui/form";
 import { z } from "zod";
 import { ticketSchema } from "@/ValidationSchema/ticket";
@@ -20,15 +20,16 @@ import {
 import { Button } from "./ui/button";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Project, Ticket } from "@prisma/client";
+import { Ticket } from "@prisma/client";
 
 type TicketFormData = z.infer<typeof ticketSchema>;
 
 interface Props {
+  projectId?: Number | undefined;
   ticket?: Ticket;
-  project: Project;
 }
-const TicketForm = ({ ticket, project }: Props) => {
+
+const TicketForm = ({ projectId, ticket }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -44,6 +45,7 @@ const TicketForm = ({ ticket, project }: Props) => {
       if (ticket) {
         await axios.patch("/api/tickets/" + ticket.id, values);
       } else {
+        values.projectId = Number(projectId);
         await axios.post("/api/tickets", values);
       }
       setIsSubmitting(false);

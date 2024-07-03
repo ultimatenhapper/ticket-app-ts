@@ -1,12 +1,10 @@
 import prisma from "@/prisma/db";
 import DataTable from "./DataTable";
-import { buttonVariants } from "@/components/ui/button";
-import Link from "next/link";
 import Pagination from "@/components/Pagination";
 import StatusFilter from "@/components/StatusFilter";
 import { Status, Ticket } from "@prisma/client";
 import { getServerSession } from "next-auth";
-import options from "../api/auth/[...nextauth]/options";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 
 export interface SearchParams {
   status: Status;
@@ -15,7 +13,7 @@ export interface SearchParams {
 }
 
 const Tickets = async ({ searchParams }: { searchParams: SearchParams }) => {
-  const session = await getServerSession(options);
+  const session = await getServerSession(authOptions);
 
   if (!session) {
     return <p className="text-destructive">Login required</p>;
@@ -41,9 +39,23 @@ const Tickets = async ({ searchParams }: { searchParams: SearchParams }) => {
     };
   }
 
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    include: { projects: true },
+  });
+
   const ticketCount = await prisma.ticket.count({ where });
   const tickets = await prisma.ticket.findMany({
-    where,
+    where: {
+      ...where,
+      projectId: {
+        in: user?.projects.map((project) => project.id),
+      },
+    },
+    include: {
+      project: true,
+      assignedToUser: true,
+    },
     orderBy: {
       [orderBy]: "desc",
     },

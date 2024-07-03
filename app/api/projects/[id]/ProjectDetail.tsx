@@ -1,3 +1,6 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Markdown from "react-markdown";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -8,19 +11,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Project, User } from "@prisma/client";
+import { Project } from "@prisma/client";
 import Link from "next/link";
-import React from "react";
 import DeleteButton from "./DeleteButton";
-import AssignProject from "@/components/AssignProject";
 import { Progress } from "@/components/ui/progress";
+import { useSession } from "next-auth/react";
+import { setCookie } from "cookies-next";
 
 interface Props {
   project: Project;
-  users: User[];
 }
 
-const ProjectDetail = ({ project, users }: Props) => {
+const ProjectDetail = ({ project }: Props) => {
+  const [isAdmin, setIsAdmin] = useState(false);
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session?.user?.roles === "ADMIN") setIsAdmin(true);
+    setCookie("currentProject", project.id);
+  }, [session, project.id]);
+
   return (
     <div className="lg:grid lg:grid-cols-4">
       <Card className="mx-4 mb-4 lg:col-span-3 lg:mr-4">
@@ -69,7 +79,7 @@ const ProjectDetail = ({ project, users }: Props) => {
         >
           Edit Project
         </Link>
-        <DeleteButton projectId={project.id} />
+        {isAdmin && <DeleteButton projectId={project.id} />}
       </div>
     </div>
   );

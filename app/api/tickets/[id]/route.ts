@@ -2,15 +2,16 @@ import { ticketPatchSchema } from "@/ValidationSchema/ticket";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/db";
 import { getServerSession } from "next-auth";
-import options from "../../auth/[...nextauth]/options";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 interface Props {
   params: { id: string };
 }
 
 export async function PATCH(request: NextRequest, { params }: Props) {
-  const session = await getServerSession(options);
+  const session = await getServerSession(authOptions);
 
+  console.log("PATCH", { session });
   if (!session) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -30,9 +31,11 @@ export async function PATCH(request: NextRequest, { params }: Props) {
     return NextResponse.json({ error: "Ticket Not Found" }, { status: 404 });
   }
 
-  if (body?.assignedToUserId) {
-    body.assignedToUserId = parseInt(body.assignedToUserId);
-  }
+  // if (body?.assignedToUserId) {
+  // body.assignedToUserId = parseInt(body.assignedToUserId);
+  // }
+  // body.assignedToUserId = session.user.id;
+
   const updatedTicket = await prisma.ticket.update({
     where: { id: ticket.id },
     data: {
@@ -44,7 +47,7 @@ export async function PATCH(request: NextRequest, { params }: Props) {
 }
 
 export async function DELETE(request: NextRequest, { params }: Props) {
-  const session = await getServerSession(options);
+  const session = await getServerSession(authOptions);
 
   if (!session) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });

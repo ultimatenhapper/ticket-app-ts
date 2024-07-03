@@ -1,20 +1,24 @@
-import options from "@/app/api/auth/[...nextauth]/options";
-import { Project } from "@prisma/client";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+// import { Project } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import dynamic from "next/dynamic";
-import React from "react";
+import { cookies } from "next/headers";
 
 const TicketForm = dynamic(() => import("@/components/TicketForm"), {
   ssr: false,
 });
 
-const NewTicket = async (project: Project) => {
-  const session = await getServerSession(options);
+const NewTicket = async () => {
+  const session = await getServerSession(authOptions);
 
   if (!session) {
     return <p className="text-destructive">Login required</p>;
   }
-  return <TicketForm project={project} />;
+
+  const cookieStore = cookies();
+  const projectId = cookieStore.get("currentProject")?.value;
+
+  return <TicketForm projectId={Number(projectId)} />;
 };
 
 export default NewTicket;

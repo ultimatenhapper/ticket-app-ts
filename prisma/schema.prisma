@@ -6,23 +6,23 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
 model Ticket {
-  id Int @id @default(autoincrement())
-  title String @db.VarChar(255)
-  description String @db.Text
-  status Status @default(OPEN)
-  priority Priority @default(MEDIUM)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  assignedToUserId Int?
-  assignedToUser User? @relation(fields: [assignedToUserId], references: [id])
-  projectId Int?
-  project Project? @relation(fields: [projectId], references: [id])
+  id               Int      @id @default(autoincrement())
+  title            String   @db.VarChar(255)
+  description      String   @db.Text
+  status           Status   @default(OPEN)
+  priority         Priority @default(MEDIUM)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  assignedToUser   User?    @relation(fields: [assignedToUserId], references: [id])
+  assignedToUserId String?
+  projectId        Int?
+  project          Project? @relation(fields: [projectId], references: [id])
 }
 
 enum Status {
@@ -38,27 +38,85 @@ enum Priority {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  name String
-  username String @unique
-  password String
-  role Role @default(USER)
-  assignedTickets Ticket[]
-  projects Project[] @relation("UserProjects")
+  id            String    @id @default(uuid())
+  name          String?
+  roles         Role      @default(USER)
+  password      String?
+  isActive      Boolean   @default(true)
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+
+  accounts      Account[]
+  sessions      Session[]
+  projects      Project[]
+  tickets       Ticket[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?   @db.Text
+  access_token      String?   @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?   @db.Text
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
 }
 
 enum Role {
-  ADMIN 
+  ADMIN
   TECH
   USER
 }
 
 model Project {
-  id Int @id @default(autoincrement())
-  name String
-  description String @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  tickets Ticket[]
-  users User[] @relation("UserProjects")
+  id          Int           @id @default(autoincrement())
+  name        String
+  description String        @db.Text
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  tickets     Ticket[]
+  users       User[]
 }
+
+// model ProjectUser {
+//   projectId Int
+//   userId    String
+
+//   project Project @relation(fields: [projectId], references: [id])
+//   user    User    @relation(fields: [userId], references: [id])
+
+//   @@id([projectId, userId])
+// }

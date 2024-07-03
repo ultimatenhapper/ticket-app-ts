@@ -2,14 +2,14 @@ import { projectSchema } from "@/ValidationSchema/project";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/db";
 import { getServerSession } from "next-auth";
-import options from "../../auth/[...nextauth]/options";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 interface Props {
   params: { id: string };
 }
 
 export async function PATCH(request: NextRequest, { params }: Props) {
-  const session = await getServerSession(options);
+  const session = await getServerSession(authOptions);
 
   if (!session) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });

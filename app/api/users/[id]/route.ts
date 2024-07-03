@@ -3,7 +3,7 @@ import prisma from "@/prisma/db";
 import bcrypt from "bcryptjs";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import options from "../../auth/[...nextauth]/options";
+import options from "../../../auth/[...nextauth]/route";
 
 interface Props {
   params: { id: string };

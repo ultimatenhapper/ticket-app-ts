@@ -3,12 +3,13 @@ import React from "react";
 import DataTableSimple from "./data-table-simple";
 import prisma from "@/prisma/db";
 import { getServerSession } from "next-auth";
-import options from "../api/auth/[...nextauth]/options";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 
 const Users = async () => {
-  const session = await getServerSession(options);
+  const session = await getServerSession(authOptions);
 
-  if (session?.user.role !== "ADMIN") {
+  console.log("users", { session });
+  if (session?.user.roles !== "ADMIN") {
     return <p className="text-destructive">Admin access required</p>;
   }
 

@@ -13,10 +13,10 @@ CREATE TABLE `Project` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `_UserProjects` (
+CREATE TABLE `_ProjectToUser` (
     `A` INTEGER NOT NULL,
-    `B` INTEGER NOT NULL,
+    `B` VARCHAR(191) NOT NULL,
 
-    UNIQUE INDEX `_UserProjects_AB_unique`(`A`, `B`),
-    INDEX `_UserProjects_B_index`(`B`)
+    UNIQUE INDEX `_ProjectToUser_AB_unique`(`A`, `B`),
+    INDEX `_ProjectToUser_B_index`(`B`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

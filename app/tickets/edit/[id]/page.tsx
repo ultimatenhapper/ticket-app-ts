@@ -1,8 +1,7 @@
-import options from "@/app/api/auth/[...nextauth]/options";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/prisma/db";
 import { getServerSession } from "next-auth";
 import dynamic from "next/dynamic";
-import React from "react";
 
 interface Props {
   params: { id: string };
@@ -12,7 +11,7 @@ const TicketForm = dynamic(() => import("@/components/TicketForm"), {
 });
 
 const EditTicket = async ({ params }: Props) => {
-  const session = await getServerSession(options);
+  const session = await getServerSession(authOptions);
 
   if (!session) {
     return <p className="text-destructive">Login required</p>;

@@ -34,10 +34,10 @@ const DataTableSimple = ({ users }: Props) => {
                       <Link href={`/users/${user.id}`}>{user.name}</Link>
                     </TableCell>
                     <TableCell>
-                      <Link href={`/users/${user.id}`}>{user.username}</Link>
+                      <Link href={`/users/${user.id}`}>{user.email}</Link>
                     </TableCell>
                     <TableCell>
-                      <Link href={`/users/${user.id}`}>{user.role}</Link>
+                      <Link href={`/users/${user.id}`}>{user.roles[0]}</Link>
                     </TableCell>
                   </TableRow>
                 ))

@@ -109,7 +109,7 @@ const UserForm = ({ user }: Props) => {
             <FormField
               control={form.control}
               name="role"
-              defaultValue={user?.role}
+              defaultValue={user?.roles}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Role</FormLabel>
@@ -121,7 +121,7 @@ const UserForm = ({ user }: Props) => {
                       <SelectTrigger>
                         <SelectValue
                           placeholder="Role..."
-                          defaultValue={user?.role}
+                          defaultValue={user?.roles}
                         />
                       </SelectTrigger>
                     </FormControl>
