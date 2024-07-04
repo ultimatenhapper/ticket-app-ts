@@ -1,7 +1,7 @@
 import prisma from "@/prisma/db";
 import { getServerSession } from "next-auth";
 import ProjectDetail from "@/app/api/projects/[id]/ProjectDetail";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import AssignProject from "@/components/AssignProject";
 
 interface Props {

@@ -3,7 +3,7 @@ import DashRecentTickets from "@/components/DashRecentTickets";
 import prisma from "@/prisma/db";
 import { getServerSession } from "next-auth";
 import React from "react";
-import { authOptions } from "./api/auth/[...nextauth]/route";
+import { authOptions } from "./api/auth/[...nextauth]/options";
 import { redirect } from "next/navigation";
 
 const Dashboard = async () => {

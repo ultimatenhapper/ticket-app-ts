@@ -2,7 +2,7 @@ import { ticketPatchSchema } from "@/ValidationSchema/ticket";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/db";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "../../auth/[...nextauth]/options";
 
 interface Props {
   params: { id: string };

@@ -2,7 +2,7 @@ import { projectSchema } from "@/ValidationSchema/project";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/db";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
 interface Props {
   params: { id: string };

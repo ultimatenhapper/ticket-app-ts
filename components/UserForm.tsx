@@ -64,7 +64,7 @@ const UserForm = ({ user }: Props) => {
           <FormField
             control={form.control}
             name="name"
-            defaultValue={user?.name}
+            defaultValue={user?.name ?? undefined}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Full name</FormLabel>
@@ -77,7 +77,7 @@ const UserForm = ({ user }: Props) => {
           <FormField
             control={form.control}
             name="username"
-            defaultValue={user?.username}
+            defaultValue={user?.email}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Username</FormLabel>

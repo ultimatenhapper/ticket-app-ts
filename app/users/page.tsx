@@ -3,7 +3,7 @@ import React from "react";
 import DataTableSimple from "./data-table-simple";
 import prisma from "@/prisma/db";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import { authOptions } from "../api/auth/[...nextauth]/options";
 
 const Users = async () => {
   const session = await getServerSession(authOptions);
