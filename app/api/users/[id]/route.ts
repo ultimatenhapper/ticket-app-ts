@@ -3,14 +3,14 @@ import prisma from "@/prisma/db";
 import bcrypt from "bcryptjs";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import options from "../../../auth/[...nextauth]/route";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 interface Props {
   params: { id: string };
 }
 
 export async function PATCH(request: NextRequest, { params }: Props) {
-  const session = await getServerSession(options);
+  const session = await getServerSession(authOptions);
 
   if (!session) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -23,7 +23,7 @@ export async function PATCH(request: NextRequest, { params }: Props) {
   }
 
   const user = await prisma.user.findUnique({
-    where: { id: parseInt(params.id) },
+    where: { id: params.id },
   });
 
   if (!user) {
@@ -37,17 +37,17 @@ export async function PATCH(request: NextRequest, { params }: Props) {
     delete body.password;
   }
 
-  if (user.username !== body.username) {
-    const duplicateUsername = await prisma.user.findUnique({
-      where: { username: body.username },
-    });
-    if (duplicateUsername) {
-      return NextResponse.json(
-        { message: "Duplicate Username" },
-        { status: 409 }
-      );
-    }
-  }
+  // if (user.name !== body.username) {
+  //   const duplicateUsername = await prisma.user.findUnique({
+  //     where: { name: body.username },
+  //   });
+  //   if (duplicateUsername) {
+  //     return NextResponse.json(
+  //       { message: "Duplicate Username" },
+  //       { status: 409 }
+  //     );
+  //   }
+  // }
 
   const updateUser = await prisma.user.update({
     where: { id: user.id },
