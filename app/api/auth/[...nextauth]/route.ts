@@ -1,12 +1,20 @@
 import { signInEmailPassword } from "@/auth/actions/auth-actions";
 import prisma from "@/prisma/db";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { NextAuthOptions } from "next-auth";
+import { Role, User } from "@prisma/client";
+import { Awaitable, NextAuthOptions } from "next-auth";
 import { Adapter } from "next-auth/adapters";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import GithubProvider from "next-auth/providers/github";
+import { JWT } from "next-auth/jwt";
+
+type ExtendedUser = User & {
+  roles: string[];
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as Adapter,
@@ -19,33 +27,41 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.AUTH_GOOGLE_ID ?? "",
       clientSecret: process.env.AUTH_GOOGLE_SECRET ?? "",
     }),
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        email: {
-          label: "Email",
-          type: "email",
-          placeholder: "usuario@email.com",
-        },
-        password: {
-          label: "Password",
-          type: "password",
-          placeholder: "******",
-        },
-      },
-      async authorize(credentials, req) {
-        const user = await signInEmailPassword(
-          credentials!.email,
-          credentials!.password
-        );
+    // CredentialsProvider({
+    //   name: "Credentials",
+    //   credentials: {
+    //     email: {
+    //       label: "Email",
+    //       type: "email",
+    //       placeholder: "usuario@email.com",
+    //     },
+    //     password: {
+    //       label: "Password",
+    //       type: "password",
+    //       placeholder: "******",
+    //     },
+    //   },
+    //   async authorize(credentials, req) {
+    //     const user = await signInEmailPassword(
+    //       credentials!.email,
+    //       credentials!.password
+    //     );
 
-        if (user) {
-          return user;
-        }
+    //     if (user) {
+    //       const mappedUser: ExtendedUser = {
+    //         ...user,
+    //         roles: user.roles,
+    //         isActive: user.isActive,
+    //         createdAt: user.createdAt,
+    //         updatedAt: user.updatedAt,
+    //       };
 
-        return null;
-      },
-    }),
+    //       return mappedUser;
+    //     }
+
+    //     return;
+    //   },
+    // }),
   ],
   session: {
     strategy: "jwt",
@@ -54,13 +70,12 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account, profile, email, credentials }) {
       return true;
     },
-    async jwt({ token, user, account, profile }) {
+    async jwt({ token, user, account, profile }): Promise<JWT> {
       const dbUser = await prisma.user.findUnique({
         where: { email: token.email ?? "no-email" },
       });
       if (dbUser?.isActive === false) {
         throw new Error("Usuario no está activo");
-        return null;
       }
       token.roles = dbUser?.roles ?? ["no-roles"];
       token.id = dbUser?.id ?? "no-uuid";
