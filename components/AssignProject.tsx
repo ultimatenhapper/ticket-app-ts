@@ -1,25 +1,20 @@
 "use client";
 
-import axios from "axios";
 import { useState } from "react";
 
 import { Project, User } from "@prisma/client";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
+
 import { IoPersonCircleOutline } from "react-icons/io5";
 import { CheckboxMultiple } from "./CheckboxMultiple";
 
 const AssignProject = ({
   project,
   users,
+  assignedUsers,
 }: {
   project: Project;
   users: User[];
+  assignedUsers: User[] | undefined;
 }) => {
   const [isAssigning, setIsAssigning] = useState(false);
   const [error, setError] = useState("");
@@ -35,7 +30,9 @@ const AssignProject = ({
           <IoPersonCircleOutline style={{ height: 100, width: 100 }} />
         </button>
         <div className="ml-3">
-          {isAssigning && <CheckboxMultiple users={users} />}
+          {isAssigning && (
+            <CheckboxMultiple users={users} assignedUsers={assignedUsers} />
+          )}
         </div>
       </div>
     </>

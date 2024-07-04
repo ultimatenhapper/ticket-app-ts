@@ -57,6 +57,7 @@ const Sidebar = async () => {
               alt="ticketer logo"
               width={300}
               height={300}
+              priority={false}
             />
           </Link>
         </div>

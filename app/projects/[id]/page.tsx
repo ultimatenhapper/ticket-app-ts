@@ -7,6 +7,7 @@ import AssignProject from "@/components/AssignProject";
 interface Props {
   params: { id: string };
 }
+
 const ViewProject = async ({ params }: Props) => {
   const session = await getServerSession(authOptions);
 
@@ -16,9 +17,13 @@ const ViewProject = async ({ params }: Props) => {
 
   const project = await prisma.project.findUnique({
     where: { id: parseInt(params.id) },
+    include: {
+      users: true,
+    },
   });
 
   const users = await prisma.user.findMany();
+  const assignedUsers = project?.users;
 
   if (!project) {
     return <p className="text-destructive">Project not found!</p>;
@@ -28,7 +33,11 @@ const ViewProject = async ({ params }: Props) => {
     <>
       <ProjectDetail project={project} />
       <div className="flex items-center">
-        <AssignProject project={project} users={users} />
+        <AssignProject
+          project={project}
+          users={users}
+          assignedUsers={assignedUsers}
+        />
       </div>
     </>
   );

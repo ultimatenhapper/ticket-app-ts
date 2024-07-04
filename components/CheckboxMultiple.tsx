@@ -18,10 +18,12 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import { User } from "@prisma/client";
 import { useState } from "react";
+import { getCookie } from "cookies-next";
 import axios from "axios";
 
 interface Props {
   users: User[];
+  assignedUsers: User[] | undefined;
 }
 
 const FormSchema = z.object({
@@ -30,23 +32,26 @@ const FormSchema = z.object({
   }),
 });
 
-export function CheckboxMultiple({ users }: Props) {
+export function CheckboxMultiple({ users, assignedUsers }: Props) {
   const [isAssigning, setIsAssigning] = useState(false);
   const [error, setError] = useState("");
+  const projectId = getCookie("currentProject");
 
   const items = users.map((user) => ({
     id: user.id,
     label: user.name,
   }));
 
+  const defaultUsers = assignedUsers?.map((user) => user.id) || [];
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      items: [],
+      items: defaultUsers,
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
     toast({
       title: "You added the following users:",
       description: (
@@ -55,19 +60,19 @@ export function CheckboxMultiple({ users }: Props) {
         </pre>
       ),
     });
+
     setError("");
     setIsAssigning(true);
-    data.items.forEach((item) => {
-      console.log(item);
-    });
-    setIsAssigning(false);
-    // await axios
-    //   .patch(`/api/tickets/${ticket.id}`, {
-    //     assignedToUserId: userId === "0" ? null : userId,
-    //   })
-    //   .catch(() => {
-    //     setError("Unable to assign ticket");
-    //   });
+    try {
+      await axios.patch(`/api/projects/${projectId}/assign-users`, {
+        userIds: data.items,
+      });
+    } catch (err) {
+      console.log({ err });
+      setError("Unable to assign users to the project.");
+    } finally {
+      setIsAssigning(false);
+    }
   }
 
   return (
@@ -121,8 +126,12 @@ export function CheckboxMultiple({ users }: Props) {
             </FormItem>
           )}
         />
-        <Button type="submit">Add</Button>
+        <Button type="submit" disabled={isAssigning}>
+          {" "}
+          {isAssigning ? "Assigning..." : "Add"}
+        </Button>
       </form>
+      {error && <p className="text-red-500">{error}</p>}
     </Form>
   );
 }
