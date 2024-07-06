@@ -19,16 +19,23 @@ const statuses: { label: string; value?: string }[] = [
 const StatusFilter = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const projectParams = searchParams.get("project") || "";
+  const statusParams = searchParams.get("status") || "";
 
   return (
     <Select
-      defaultValue={searchParams.get("status") || ""}
+      defaultValue={statusParams || ""}
       onValueChange={(status) => {
-        const params = new URLSearchParams();
+        const params = new URLSearchParams(searchParams);
 
-        if (status) params.append("status", status);
+        if (status && status !== "0") {
+          params.set("status", status);
+        } else {
+          params.delete("status");
+        }
 
-        const query = params.size ? `${params.toString()}` : "0";
+        const query = params.toString();
+        // const query = params.size ? `${params.toString()}` : "0";
         router.push(`/tickets?${query}`);
       }}
     >
