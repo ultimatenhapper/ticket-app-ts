@@ -22,6 +22,19 @@ const ViewProject = async ({ params }: Props) => {
     },
   });
 
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    include: {
+      projects: {
+        where: { id: parseInt(params.id) },
+        include: {
+          tickets: true,
+        },
+      },
+    },
+  });
+
+  const tickets = user?.projects.length ? user.projects[0].tickets : [];
   const users = await prisma.user.findMany();
   const assignedUsers = project?.users;
 
@@ -31,7 +44,7 @@ const ViewProject = async ({ params }: Props) => {
 
   return (
     <>
-      <ProjectDetail project={project} />
+      <ProjectDetail project={project} tickets={tickets} />
       <div className="flex items-center">
         <AssignProject
           project={project}

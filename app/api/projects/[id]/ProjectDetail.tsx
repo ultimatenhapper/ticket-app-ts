@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Project } from "@prisma/client";
+import { Project, Ticket } from "@prisma/client";
 import Link from "next/link";
 import DeleteButton from "./DeleteButton";
 import { Progress } from "@/components/ui/progress";
@@ -20,15 +20,27 @@ import { setCookie } from "cookies-next";
 
 interface Props {
   project: Project;
+  tickets: Ticket[];
 }
 
-const ProjectDetail = ({ project }: Props) => {
+const ProjectDetail = ({ project, tickets }: Props) => {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [progress, setProgress] = useState(0);
   const { data: session } = useSession();
+
+  const calculateProgress = () => {
+    const closedTickets = tickets.filter(
+      (ticket) => ticket.status === "CLOSED"
+    );
+    return tickets.length > 0
+      ? (closedTickets.length / tickets.length) * 100
+      : 0;
+  };
 
   useEffect(() => {
     if (session?.user?.roles === "ADMIN") setIsAdmin(true);
     setCookie("currentProject", project.id);
+    setProgress(Math.ceil(calculateProgress()));
   }, [session, project.id]);
 
   return (
@@ -50,7 +62,10 @@ const ProjectDetail = ({ project }: Props) => {
         </CardHeader>
         <CardContent className="prose dark:prose-invert">
           <Markdown>{project.description}</Markdown>
-          <Progress value={50} />
+          <div className="flex flex-row gap-5 text-3xl items-center">
+            <Progress value={progress} />
+            <span>{progress}%</span>
+          </div>
         </CardContent>
         <CardFooter>
           {project.updatedAt.toLocaleDateString("en-ES", {

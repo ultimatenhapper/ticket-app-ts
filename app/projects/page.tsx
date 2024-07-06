@@ -14,7 +14,9 @@ const Projects = async () => {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    include: { projects: true },
+    include: {
+      projects: true,
+    },
   });
 
   const projects = user?.projects;
