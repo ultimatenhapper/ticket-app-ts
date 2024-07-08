@@ -13,7 +13,7 @@ const ProjectCard = ({ project }: Props) => {
   return (
     <div className="mx-auto right-0 mt-2 w-60">
       <div className="bg-white rounded overflow-hidden shadow-lg">
-        <div className="flex flex-col items-center justify-center text-center p-6 bg-sky-600 border-b">
+        <div className="flex flex-col items-center justify-center text-center p-6 bg-sky-600 border-b rounded-xl">
           {/* <Image
             key={pokemon.id}
             src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`}

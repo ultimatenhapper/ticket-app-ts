@@ -30,6 +30,11 @@ const menuItems = [
     path: "/tickets",
   },
   {
+    icon: <IoCalendarOutline />,
+    title: "Calendar",
+    path: "/calendar",
+  },
+  {
     icon: <IoPersonOutline />,
     title: "Users",
     path: "/users",
