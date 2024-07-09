@@ -13,10 +13,12 @@ import {
 } from "@/components/ui/card";
 import { Project, Ticket } from "@prisma/client";
 import Link from "next/link";
-import DeleteButton from "./DeleteButton";
 import { Progress } from "@/components/ui/progress";
 import { useSession } from "next-auth/react";
 import { setCookie } from "cookies-next";
+
+import { amountToTime } from "@/helpers/helpers";
+import DeleteButton from "./DeleteButton";
 
 interface Props {
   project: Project;
@@ -26,6 +28,7 @@ interface Props {
 const ProjectDetail = ({ project, tickets }: Props) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [tts, setTts] = useState("");
   const { data: session } = useSession();
 
   const calculateProgress = () => {
@@ -37,10 +40,20 @@ const ProjectDetail = ({ project, tickets }: Props) => {
       : 0;
   };
 
+  const calculateTts = () => {
+    const totalTime = tickets.reduce(
+      (acc: number, ticket: Ticket) => acc + Number(ticket.TTS),
+      0
+    );
+
+    return amountToTime(totalTime);
+  };
+
   useEffect(() => {
     if (session?.user?.roles === "ADMIN") setIsAdmin(true);
     setCookie("currentProject", project.id);
     setProgress(Math.ceil(calculateProgress()));
+    setTts(calculateTts());
   }, [session, project.id]);
 
   return (
@@ -57,6 +70,16 @@ const ProjectDetail = ({ project, tickets }: Props) => {
               hour: "numeric",
               minute: "2-digit",
               hour12: true,
+            })}{" "}
+            <br />
+            Updated:{" "}
+            {project.updatedAt.toLocaleDateString("en-ES", {
+              year: "2-digit",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
             })}
           </CardDescription>
         </CardHeader>
@@ -67,16 +90,7 @@ const ProjectDetail = ({ project, tickets }: Props) => {
             <span>{progress}%</span>
           </div>
         </CardContent>
-        <CardFooter>
-          {project.updatedAt.toLocaleDateString("en-ES", {
-            year: "2-digit",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "numeric",
-            minute: "2-digit",
-            hour12: true,
-          })}
-        </CardFooter>
+        <CardFooter className="text-2xl">Total Time Spent {tts}</CardFooter>
       </Card>
       <div className="mx-4 flex lg:flex-col lg:mx-0 gap-2">
         {/* <AssignProject project={project} users={users} /> */}

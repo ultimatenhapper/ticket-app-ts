@@ -12,9 +12,11 @@ import {
 } from "@/components/ui/card";
 import { Ticket, User } from "@prisma/client";
 import Link from "next/link";
-import React from "react";
-import DeleteButton from "./DeleteButton";
+
 import AssignTicket from "@/components/AssignTicket";
+import DeleteButton from "./DeleteButton";
+import TicketTracker from "@/components/TicketTracker";
+import { amountToTime } from "@/helpers/helpers";
 
 interface Props {
   ticket: Ticket;
@@ -41,20 +43,23 @@ const TicketDetail = ({ ticket, users }: Props) => {
               minute: "2-digit",
               hour12: true,
             })}
+            <br />
+            Updated:{" "}
+            {ticket.updatedAt.toLocaleDateString("en-ES", {
+              year: "2-digit",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
+            })}
           </CardDescription>
         </CardHeader>
         <CardContent className="prose dark:prose-invert">
           <Markdown>{ticket.description}</Markdown>
         </CardContent>
-        <CardFooter>
-          {ticket.updatedAt.toLocaleDateString("en-ES", {
-            year: "2-digit",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "numeric",
-            minute: "2-digit",
-            hour12: true,
-          })}
+        <CardFooter className={"text-2xl"}>
+          Total Time Spent: {amountToTime(Number(ticket.TTS))}
         </CardFooter>
       </Card>
       <div className="mx-4 flex lg:flex-col lg:mx-0 gap-2">
@@ -69,6 +74,7 @@ const TicketDetail = ({ ticket, users }: Props) => {
         </Link>
         <DeleteButton ticketId={ticket.id} />
       </div>
+      <TicketTracker ticket={ticket} />
     </div>
   );
 };

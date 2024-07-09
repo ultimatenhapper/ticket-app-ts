@@ -50,11 +50,13 @@ const TicketForm = ({ projectId, ticket }: Props) => {
       }
       setIsSubmitting(false);
 
-      if (ticket) {
-        router.push("/tickets");
-      } else {
-        router.push(`/projects/${projectId}`);
-      }
+      // if (ticket) {
+      //   router.back();
+      //   // router.push("/tickets");
+      // } else {
+      //   router.push(`/projects/${projectId}`);
+      // }
+      router.back();
       router.refresh();
     } catch (error) {
       console.log("TicketForm: error");
