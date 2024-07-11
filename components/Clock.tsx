@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Ticket } from "@prisma/client";
 
@@ -11,20 +11,38 @@ const Clock = ({ ticket }: Props) => {
   const [time, setTime] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [isPaused, setIsPaused] = useState(true);
+  const startTimeRef = useRef<number | null>(null);
+  const accumulatedTimeRef = useRef<number>(0);
 
   useEffect(() => {
-    let interval = undefined;
+    let interval: NodeJS.Timeout | null = null;
 
     if (isActive && !isPaused) {
+      if (startTimeRef.current === null) {
+        startTimeRef.current = Date.now();
+      } else {
+        startTimeRef.current = Date.now() - accumulatedTimeRef.current;
+      }
+
       interval = setInterval(() => {
-        setTime((time) => time + 1);
+        if (startTimeRef.current !== null) {
+          const elapsedTime = Date.now() - startTimeRef.current;
+          setTime(elapsedTime / 1000);
+        }
       }, 1000);
-    } else {
-      clearInterval(interval);
+    } else if (!isActive) {
+      if (interval) clearInterval(interval);
+      accumulatedTimeRef.current = 0;
+      startTimeRef.current = null;
+    } else if (isPaused) {
+      if (interval) clearInterval(interval);
+      if (startTimeRef.current !== null) {
+        accumulatedTimeRef.current = Date.now() - startTimeRef.current;
+      }
     }
 
     return () => {
-      clearInterval(interval);
+      if (interval) clearInterval(interval);
     };
   }, [isActive, isPaused]);
 
@@ -42,10 +60,11 @@ const Clock = ({ ticket }: Props) => {
     setIsPaused(true);
     await axios.patch("/api/tickets/" + ticket.id, { TTS: ticket.TTS + time });
     setTime(0);
+    accumulatedTimeRef.current = 0;
   };
 
   const formatTime = (time = 0) => {
-    const getSeconds = `0${time % 60}`.slice(-2);
+    const getSeconds = `0${Math.floor(time % 60)}`.slice(-2);
     const minutes = Math.floor(time / 60);
     const getMinutes = `0${minutes % 60}`.slice(-2);
     const getHours = `0${Math.floor(time / 3600)}`.slice(-2);
