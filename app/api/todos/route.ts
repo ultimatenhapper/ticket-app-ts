@@ -1,4 +1,4 @@
-import { ticketSchema } from "@/ValidationSchema/ticket";
+import { todoSchema } from "@/ValidationSchema/todo";
 import prisma from "@/prisma/db";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
@@ -11,40 +11,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
   const body = await request.json();
-  const validation = ticketSchema.safeParse(body);
+  const validation = todoSchema.safeParse(body);
 
   if (!validation.success) {
     console.log(validation.error.format());
     return NextResponse.json(validation.error.format(), { status: 400 });
   }
 
-  const {
-    title,
-    description,
-    status,
-    priority,
-    dueDate,
-    projectId,
-    assignedToUserId,
-  } = body;
+  const { name, description, status } = body;
 
-  const ticketStatus = status || "OPEN";
-  const ticketPriority = priority || "LOW";
+  const todoStatus = status || "PENDING";
 
-  const newTicket = await prisma.ticket.create({
+  const newtodo = await prisma.todo.create({
     data: {
-      title,
+      name,
       description,
-      status: ticketStatus,
-      priority: ticketPriority,
-      assignedToUserId,
-      dueDate,
-      project: {
-        connect: {
-          id: projectId,
-        },
-      },
-      assignedToUser: {
+      status: todoStatus,
+      users: {
         connect: {
           id: session.user.id,
         },
@@ -52,5 +35,5 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  return NextResponse.json(newTicket, { status: 201 });
+  return NextResponse.json(newtodo, { status: 201 });
 }

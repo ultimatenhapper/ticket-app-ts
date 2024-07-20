@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "./ui/form";
 import { z } from "zod";
+import DatePicker from "react-datepicker";
 import { ticketSchema } from "@/ValidationSchema/ticket";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input } from "./ui/input";
 import SimpleMDE from "react-simplemde-editor";
 
 import "easymde/dist/easymde.min.css";
@@ -17,10 +17,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Ticket } from "@prisma/client";
+
+import "react-datepicker/dist/react-datepicker.css";
+import { useSession } from "next-auth/react";
 
 type TicketFormData = z.infer<typeof ticketSchema>;
 
@@ -30,6 +35,7 @@ interface Props {
 }
 
 const TicketForm = ({ projectId, ticket }: Props) => {
+  const { data: session } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -39,27 +45,32 @@ const TicketForm = ({ projectId, ticket }: Props) => {
   });
 
   async function onSubmit(values: z.infer<typeof ticketSchema>) {
+    console.log({ values });
     try {
       setIsSubmitting(true);
       setError("");
+      // if (values.dueDate) {
+      //   values.dueDate = new Date(values.dueDate);
+      // }
       if (ticket) {
         await axios.patch("/api/tickets/" + ticket.id, values);
       } else {
         values.projectId = Number(projectId);
+        // values.assignedToUserId = session?.user.id;
         await axios.post("/api/tickets", values);
       }
       setIsSubmitting(false);
 
-      // if (ticket) {
-      //   router.back();
-      //   // router.push("/tickets");
-      // } else {
-      //   router.push(`/projects/${projectId}`);
-      // }
-      router.back();
+      if (ticket) {
+        router.back();
+        // router.push("/tickets");
+      } else {
+        router.push(`/projects/${projectId}`);
+      }
+      // router.back();
       router.refresh();
     } catch (error) {
-      console.log("TicketForm: error");
+      console.log("TicketForm: error " + error);
       setError("Unknown Error occurred");
       setIsSubmitting(false);
     }
@@ -85,6 +96,26 @@ const TicketForm = ({ projectId, ticket }: Props) => {
               </FormItem>
             )}
           />
+          {/* <FormField
+            control={form.control}
+            name="dueDate"
+            defaultValue={ticket?.dueDate}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="mr-2">Due date</FormLabel>
+                <FormControl>
+                  <DatePicker
+                    className="input"
+                    placeholderText="Select date"
+                    selected={field.value ? new Date(field.value) : undefined}
+                    onChange={(date) => field.onChange(date)}
+                    startDate={new Date()}
+                    dateFormat="MM/dd/yyyy"
+                  />
+                </FormControl>
+              </FormItem>
+            )} 
+          /> */}
           <Controller
             name="description"
             control={form.control}

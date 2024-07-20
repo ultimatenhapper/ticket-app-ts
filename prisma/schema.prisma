@@ -18,6 +18,7 @@ model Ticket {
   status           Status   @default(OPEN)
   priority         Priority @default(MEDIUM)
   
+  dueDate          DateTime? @db.Date
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -70,6 +71,7 @@ model User {
   sessions      Session[]
   projects      Project[]
   tickets       Ticket[]
+  todos         Todo[]
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -124,6 +126,7 @@ model Project {
   id          Int           @id @default(autoincrement())
   name        String
   description String        @db.Text
+  dueDate     DateTime?     @db.Date
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   tickets     Ticket[]
@@ -139,3 +142,20 @@ model Project {
 
 //   @@id([projectId, userId])
 // }
+
+model Todo {
+  id          Int           @id @default(autoincrement())
+  name        String
+  description String        @db.Text
+  status      TodoStatus    @default(PENDING)
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  users       User[]
+}
+
+enum TodoStatus {
+  PENDING
+  DONE
+}

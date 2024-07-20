@@ -14,6 +14,11 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
 const menuItems = [
+  // {
+  //   icon: <IoCalendarOutline />,
+  //   title: "Calendar",
+  //   path: "/calendar",
+  // },
   {
     icon: <IoCalendarOutline />,
     title: "Dashboard",
@@ -30,9 +35,9 @@ const menuItems = [
     path: "/tickets",
   },
   {
-    icon: <IoCalendarOutline />,
-    title: "Calendar",
-    path: "/calendar",
+    icon: <IoCheckboxOutline />,
+    title: "Todos",
+    path: "/todos",
   },
   {
     icon: <IoPersonOutline />,

@@ -1,8 +1,8 @@
 import React from "react";
 import prisma from "@/prisma/db";
-import TicketDetail from "@/app/api/tickets/[id]/TicketDetail";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+import TicketDetail from "./TicketDetail";
 
 interface Props {
   params: { id: string };

@@ -5,7 +5,9 @@ export const ticketSchema = z.object({
   description: z.string().min(1, "Description is required").max(65535),
   status: z.string().min(1, "Status").max(10).optional(),
   priority: z.string().min(1, "Priority").max(10).optional(),
+  dueDate: z.date().optional().nullable(),
   projectId: z.number().optional(),
+  assignedToUserId: z.string().optional(),
 });
 
 export const ticketPatchSchema = z.object({
@@ -17,4 +19,5 @@ export const ticketPatchSchema = z.object({
     .optional(),
   status: z.string().min(1, "Status").max(10).optional(),
   priority: z.string().min(1, "Priority").max(10).optional(),
+  dueDate: z.date().optional().nullable(),
 });
