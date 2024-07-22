@@ -5,6 +5,7 @@ import { authOptions } from "../api/auth/[...nextauth]/options";
 import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import TodoGrid from "./TodoGrid";
+import { IoAddCircle } from "react-icons/io5";
 
 const Todos = async () => {
   const session = await getServerSession(authOptions);
@@ -24,12 +25,9 @@ const Todos = async () => {
 
   return (
     <div className="relative">
-      <div className="absolute top-0 right-0 m-2">
-        <Link
-          href="/todos/new"
-          className={buttonVariants({ variant: "default" })}
-        >
-          New Todo
+      <div className="fixed top-10 right-10">
+        <Link href="/todos/new" className="flex items-center p-2 rounded-full">
+          <IoAddCircle size={90} />
         </Link>
       </div>
       <div className="flex items-center justify-center mt-8">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ProjectGrid } from "./ProjectGrid";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/options";
+import { IoAddCircle } from "react-icons/io5";
 
 const Projects = async () => {
   const session = await getServerSession(authOptions);
@@ -23,12 +24,12 @@ const Projects = async () => {
 
   return (
     <div className="relative">
-      <div className="absolute top-0 right-0 m-2">
+      <div className="fixed top-10 right-10">
         <Link
           href="/projects/new"
-          className={buttonVariants({ variant: "default" })}
+          className="flex items-center p-2 rounded-full"
         >
-          New Project
+          <IoAddCircle size={90} />
         </Link>
       </div>
       <div className="flex items-center justify-center mt-8">
