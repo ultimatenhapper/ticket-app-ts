@@ -14,6 +14,7 @@ interface Props {
   pageSize: number;
   currentPage: number;
 }
+
 const Pagination = ({ itemCount, pageSize, currentPage }: Props) => {
   const pageCount = Math.ceil(itemCount / pageSize);
   const router = useRouter();

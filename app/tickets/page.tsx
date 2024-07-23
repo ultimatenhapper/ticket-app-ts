@@ -1,11 +1,12 @@
 import prisma from "@/prisma/db";
-import DataTable from "./DataTable";
-import Pagination from "@/components/Pagination";
-import StatusFilter from "@/components/StatusFilter";
-import { Status, Ticket } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/options";
+
+import DataTable from "./DataTable";
+import Pagination from "@/components/Pagination";
 import ProjectFilter from "@/components/ProjectFilter";
+import StatusFilter from "@/components/StatusFilter";
+import { Status, Ticket } from "@prisma/client";
 
 export interface SearchParams {
   project: string;
@@ -31,7 +32,7 @@ const Tickets = async ({ searchParams }: { searchParams: SearchParams }) => {
     ? searchParams.status
     : undefined;
 
-  console.log({ projectId });
+  // console.log({ projectId });
 
   let where = {};
 
@@ -50,10 +51,22 @@ const Tickets = async ({ searchParams }: { searchParams: SearchParams }) => {
     include: { projects: true },
   });
 
-  const ticketCount = await prisma.ticket.count({ where });
   const projectIds =
     projectId === 0 ? user?.projects.map((project) => project.id) : [projectId];
   const validProjectIds = projectIds?.filter((id) => !isNaN(id)) || [0];
+  const ticketCount = await prisma.ticket.count({
+    where: {
+      AND: [
+        { ...where },
+        {
+          projectId: {
+            in: validProjectIds.length > 0 ? validProjectIds : undefined,
+          },
+        },
+      ],
+    },
+  });
+
   const tickets = await prisma.ticket.findMany({
     where: {
       AND: [
@@ -75,6 +88,8 @@ const Tickets = async ({ searchParams }: { searchParams: SearchParams }) => {
     take: pageSize,
     skip: (page - 1) * pageSize,
   });
+
+  // console.log({ ticketCount });
 
   return (
     <div>
