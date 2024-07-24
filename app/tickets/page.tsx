@@ -25,14 +25,11 @@ const Tickets = async ({ searchParams }: { searchParams: SearchParams }) => {
   const page = parseInt(searchParams.page) || 1;
 
   const orderBy = searchParams.orderBy ? searchParams.orderBy : "createdAt";
-  const projectId =
-    searchParams.project !== "0" ? parseInt(searchParams.project) : 0;
+  const projectId = searchParams.project ? parseInt(searchParams.project) : 0;
   const statuses = Object.values(Status);
   const status = statuses.includes(searchParams.status)
     ? searchParams.status
     : undefined;
-
-  // console.log({ projectId });
 
   let where = {};
 
@@ -51,29 +48,33 @@ const Tickets = async ({ searchParams }: { searchParams: SearchParams }) => {
     include: { projects: true },
   });
 
+  // console.log({ projectId });
   const projectIds =
     projectId === 0 ? user?.projects.map((project) => project.id) : [projectId];
+  console.log({ projectIds });
   const validProjectIds = projectIds?.filter((id) => !isNaN(id)) || [0];
+  console.log({ validProjectIds });
   const ticketCount = await prisma.ticket.count({
     where: {
       AND: [
         { ...where },
         {
           projectId: {
-            in: validProjectIds.length > 0 ? validProjectIds : undefined,
+            in: validProjectIds.length > 0 ? validProjectIds : null,
           },
         },
       ],
     },
   });
 
+  // console.log({ ticketCount });
   const tickets = await prisma.ticket.findMany({
     where: {
       AND: [
         { ...where },
         {
           projectId: {
-            in: validProjectIds?.length > 0 ? validProjectIds : undefined,
+            in: validProjectIds?.length > 0 ? validProjectIds : null,
           },
         },
       ],
@@ -88,8 +89,6 @@ const Tickets = async ({ searchParams }: { searchParams: SearchParams }) => {
     take: pageSize,
     skip: (page - 1) * pageSize,
   });
-
-  // console.log({ ticketCount });
 
   return (
     <div>
