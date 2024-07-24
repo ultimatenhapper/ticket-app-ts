@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { Ticket } from "@prisma/client";
+import { Status, Ticket } from "@prisma/client";
 
 interface Props {
   ticket: Ticket;
@@ -58,7 +58,10 @@ const Clock = ({ ticket }: Props) => {
   const handleReset = async () => {
     setIsActive(false);
     setIsPaused(true);
-    await axios.patch("/api/tickets/" + ticket.id, { TTS: ticket.TTS + time });
+    await axios.patch("/api/tickets/" + ticket.id, {
+      status: ticket.status !== Status.STARTED ? Status.STARTED : ticket.status,
+      TTS: ticket.TTS + time,
+    });
     setTime(0);
     accumulatedTimeRef.current = 0;
   };
