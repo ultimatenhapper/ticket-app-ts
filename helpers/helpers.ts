@@ -4,7 +4,9 @@ export const amountToTime = (totalTime: number = 0) => {
   const getMinutes = `0${minutes % 60}`.slice(-2);
   const hours = Math.floor(totalTime / 3600);
   const getHours =
-    hours > 0 ? `0${Math.floor(totalTime / 3600)}:`.slice(-2) : "";
+    hours > 0
+      ? `${hours < 10 ? "0" : ""}${Math.floor(totalTime / 3600)}:`.slice(-3)
+      : "";
 
   return `${getHours}${getMinutes}:${getSeconds}`;
 };

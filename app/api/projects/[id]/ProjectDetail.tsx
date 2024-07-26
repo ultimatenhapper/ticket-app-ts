@@ -90,7 +90,9 @@ const ProjectDetail = ({ project, tickets }: Props) => {
             <span>{progress}%</span>
           </div>
         </CardContent>
-        <CardFooter className="text-2xl">Total Time Spent {tts}</CardFooter>
+        <CardFooter className="text-2xl">
+          Total Time Spent <span className="font-bold ml-4">{tts}</span>
+        </CardFooter>
       </Card>
       <div className="mx-4 flex lg:flex-col lg:mx-0 gap-2">
         {/* <AssignProject project={project} users={users} /> */}
