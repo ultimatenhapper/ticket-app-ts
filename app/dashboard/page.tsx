@@ -5,6 +5,7 @@ import prisma from "@/prisma/db";
 
 import DashChart from "@/components/DashChart";
 import DashRecentTickets from "@/components/DashRecentTickets";
+import TimeLogGraph from "@/components/TimeLogGraph";
 
 const Dashboard = async () => {
   const session = await getServerSession(authOptions);
@@ -26,6 +27,22 @@ const Dashboard = async () => {
       </p>
     );
   }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  const timeLogs = await prisma.timeLog.findMany({
+    where: {
+      startTime: {
+        gte: today,
+        lt: tomorrow,
+      },
+    },
+    include: {
+      ticket: true,
+    },
+  });
 
   const projectIds = user.projects.map((project) => project.id);
 
@@ -73,6 +90,9 @@ const Dashboard = async () => {
         </div>
         <div>
           <DashChart data={data} />
+        </div>
+        <div>
+          <TimeLogGraph timeLogs={timeLogs} />
         </div>
       </div>
     </div>

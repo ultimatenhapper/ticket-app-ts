@@ -1,17 +1,19 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Status, Ticket } from "@prisma/client";
 
 interface Props {
   ticket: Ticket;
 }
+
 const Clock = ({ ticket }: Props) => {
   const [time, setTime] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [isPaused, setIsPaused] = useState(true);
   const startTimeRef = useRef<number | null>(null);
+  const pausedTimeRef = useRef<number | null>(null);
   const accumulatedTimeRef = useRef<number>(0);
 
   useEffect(() => {
@@ -38,6 +40,7 @@ const Clock = ({ ticket }: Props) => {
       if (interval) clearInterval(interval);
       if (startTimeRef.current !== null) {
         accumulatedTimeRef.current = Date.now() - startTimeRef.current;
+        pausedTimeRef.current = Date.now();
       }
     }
 
@@ -51,11 +54,26 @@ const Clock = ({ ticket }: Props) => {
     setIsPaused(false);
   };
 
-  const handlePause = () => {
+  const handlePause = async () => {
+    if (!isActive) return;
+    if (isPaused) pausedTimeRef.current = Date.now();
+    if (!isPaused && startTimeRef.current !== null) {
+      const currentTime = Date.now();
+      const referenceTime =
+        pausedTimeRef.current !== null
+          ? pausedTimeRef.current
+          : startTimeRef.current;
+      const duration = currentTime - referenceTime!;
+      await registerTimeLog(duration);
+    }
     setIsPaused(!isPaused);
   };
 
   const handleReset = async () => {
+    if (isActive && !isPaused && startTimeRef.current !== null) {
+      const duration = Date.now() - startTimeRef.current;
+      await registerTimeLog(duration);
+    }
     setIsActive(false);
     setIsPaused(true);
     await axios.patch("/api/tickets/" + ticket.id, {
@@ -64,6 +82,19 @@ const Clock = ({ ticket }: Props) => {
     });
     setTime(0);
     accumulatedTimeRef.current = 0;
+    startTimeRef.current = null;
+    pausedTimeRef.current = null;
+  };
+
+  const registerTimeLog = async (duration: number) => {
+    const endTime = new Date();
+    const startTime = new Date(endTime.getTime() - duration);
+    await axios.post("/api/timelogs", {
+      ticketId: ticket.id,
+      startTime,
+      endTime,
+      duration: duration / 1000, // duration in seconds
+    });
   };
 
   const formatTime = (time = 0) => {
@@ -82,6 +113,7 @@ const Clock = ({ ticket }: Props) => {
         <button
           onClick={handleStart}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+          disabled={isActive}
         >
           Play
         </button>

@@ -28,7 +28,7 @@ model Ticket {
   project          Project? @relation(fields: [projectId], references: [id])
 
   TTS              Int  @default(0)
-  // timeLogs         TimeLog[]
+  timeLogs         TimeLog[]
 }
 
 enum Status {
@@ -43,19 +43,19 @@ enum Priority {
   HIGH
 }
 
-// model TimeLog {
-//   id         Int       @id @default(autoincrement())
-//   ticketId   Int
-//   ticket     Ticket    @relation(fields: [ticketId], references: [id])
-//   startTime  DateTime
-//   endTime    DateTime
-//   duration   Decimal   // Store duration in hours or minutes as needed
+model TimeLog {
+  id         Int       @id @default(autoincrement())
+  ticketId   Int
+  ticket     Ticket    @relation(fields: [ticketId], references: [id])
+  startTime  DateTime
+  endTime    DateTime
+  duration   Decimal   // Store duration in hours or minutes as needed
 
-//   createdAt  DateTime  @default(now())
-//   updatedAt  DateTime  @updatedAt
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
-//   // Additional fields and indexes if necessary
-// }
+  // Additional fields and indexes if necessary
+}
 
 model User {
   id            String    @id @default(uuid())

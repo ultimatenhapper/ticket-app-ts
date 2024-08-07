@@ -11,7 +11,7 @@ interface Props {
 export async function PATCH(request: NextRequest, { params }: Props) {
   const session = await getServerSession(authOptions);
 
-  console.log("PATCH", { session });
+  // console.log("PATCH", { session });
   if (!session) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
