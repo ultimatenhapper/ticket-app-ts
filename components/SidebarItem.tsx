@@ -11,7 +11,7 @@ interface Props {
 const SidebarItem = ({ icon, path, title }: Props) => {
   const pathName = usePathname();
 
-  console.log(path, pathName);
+  // console.log(path, pathName);
   return (
     <li>
       <Link

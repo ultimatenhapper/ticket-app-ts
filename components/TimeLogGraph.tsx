@@ -74,7 +74,7 @@ const TimeLogGraph = ({ timeLogs }: Props) => {
     };
 
     fetchData();
-  }, []);
+  }, [timeLogs]);
 
   return (
     <div>
