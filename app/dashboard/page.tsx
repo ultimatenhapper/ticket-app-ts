@@ -6,6 +6,7 @@ import prisma from "@/prisma/db";
 import DashChart from "@/components/DashChart";
 import DashRecentTickets from "@/components/DashRecentTickets";
 import TimeLogGraph from "@/components/TimeLogGraph";
+import TimeLogPeriodGraph from "@/components/TimeLogPeriodGraph";
 
 const Dashboard = async () => {
   const session = await getServerSession(authOptions);
@@ -93,6 +94,9 @@ const Dashboard = async () => {
         </div>
         <div>
           <TimeLogGraph timeLogs={timeLogs} />
+        </div>
+        <div>
+          <TimeLogPeriodGraph />
         </div>
       </div>
     </div>

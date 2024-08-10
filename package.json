@@ -22,6 +22,7 @@
     "@radix-ui/react-toast": "^1.2.1",
     "@tailwindcss/typography": "^0.5.13",
     "@types/chart.js": "^2.9.41",
+    "@types/react-datepicker": "^7.0.0",
     "axios": "^1.7.2",
     "bcryptjs": "^2.4.3",
     "chart.js": "^4.4.3",
