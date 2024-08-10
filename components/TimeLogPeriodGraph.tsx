@@ -61,7 +61,7 @@ const TimeLogPeriodGraph: React.FC = () => {
       const dailyTimes: { [key: string]: number } = {};
       timeLogs.forEach((log) => {
         const date = new Date(log.startTime).toLocaleDateString();
-        const duration = parseFloat(log.duration.toString()) / 1000 / 60;
+        const duration = parseFloat(log.duration.toString()) / 60 / 60;
         if (dailyTimes[date]) {
           dailyTimes[date] += duration;
         } else {
