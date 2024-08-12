@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import DatePicker from "react-datepicker";
+import { registerLocale } from "react-datepicker";
+import { es } from "date-fns/locale/es";
 import {
   Chart as ChartJS,
   BarElement,
@@ -14,6 +16,7 @@ import {
 } from "chart.js";
 
 import "react-datepicker/dist/react-datepicker.css";
+registerLocale("es", es);
 
 ChartJS.register(
   BarElement,
@@ -54,7 +57,7 @@ const TimeLogPeriodGraph: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch(
-        `/api/timelogs?start=${startDate.toLocaleDateString()}&end=${endDate.toLocaleDateString()}`
+        `/api/timelogs?start=${startDate.toISOString()}&end=${endDate.toISOString()}`
       );
       const timeLogs: TimeLog[] = await response.json();
 
@@ -92,6 +95,7 @@ const TimeLogPeriodGraph: React.FC = () => {
       <div>
         <DatePicker
           selected={startDate}
+          locale="es"
           onChange={(date: Date | null) => setStartDate(date || new Date())}
           selectsStart
           startDate={startDate}
@@ -99,6 +103,7 @@ const TimeLogPeriodGraph: React.FC = () => {
         />
         <DatePicker
           selected={endDate}
+          locale="es"
           onChange={(date: Date | null) => setEndDate(date || new Date())}
           selectsEnd
           startDate={startDate}

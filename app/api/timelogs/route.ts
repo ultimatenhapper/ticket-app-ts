@@ -41,7 +41,6 @@ export async function GET(request: NextRequest) {
     // Fetch time logs within a specified period
     const startDate = new Date(start as string);
     const endDate = new Date(end as string);
-
     const timeLogs = await prisma.timeLog.findMany({
       where: {
         startTime: {
