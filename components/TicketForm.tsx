@@ -26,6 +26,7 @@ import { Ticket } from "@prisma/client";
 
 import "react-datepicker/dist/react-datepicker.css";
 import { useSession } from "next-auth/react";
+import TicketTracker from "./TicketTracker";
 
 type TicketFormData = z.infer<typeof ticketSchema>;
 
@@ -217,6 +218,7 @@ const TicketForm = ({ projectId, ticket }: Props) => {
           </Button>
         </form>
       </Form>
+      {ticket && <TicketTracker ticket={ticket} />}
       <p className="text-destructive">{error}</p>
     </div>
   );
