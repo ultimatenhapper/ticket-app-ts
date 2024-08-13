@@ -35,7 +35,7 @@ interface ChartData {
 }
 
 interface Props {
-  timeLogs: TimeLog[];
+  timeLogs: (TimeLog & { title: string })[];
 }
 
 const TimeLogGraph = ({ timeLogs }: Props) => {
@@ -47,12 +47,12 @@ const TimeLogGraph = ({ timeLogs }: Props) => {
       const ticketTimes: { [key: string]: number } = {};
       let total = 0;
 
-      timeLogs.forEach((log: TimeLog) => {
+      timeLogs.forEach((log: TimeLog & { title: string }) => {
         const duration = parseFloat(log.duration.toString());
-        if (ticketTimes[log.ticketId]) {
-          ticketTimes[log.ticketId] += duration / 60;
+        if (ticketTimes[log.title]) {
+          ticketTimes[log.title] += duration / 60;
         } else {
-          ticketTimes[log.ticketId] = duration / 60;
+          ticketTimes[log.title] = duration / 60;
         }
         total += duration;
       });

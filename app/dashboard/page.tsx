@@ -45,6 +45,13 @@ const Dashboard = async () => {
     },
   });
 
+  const transformedTimeLogs = timeLogs.map((timeLog) => {
+    return {
+      ...timeLog,
+      title: timeLog.ticket.title,
+    };
+  });
+
   const projectIds = user.projects.map((project) => project.id);
 
   const tickets = await prisma.ticket.findMany({
@@ -93,7 +100,7 @@ const Dashboard = async () => {
           <DashChart data={data} />
         </div>
         <div>
-          <TimeLogGraph timeLogs={timeLogs} />
+          <TimeLogGraph timeLogs={transformedTimeLogs} />
         </div>
         <div>
           <TimeLogPeriodGraph />
