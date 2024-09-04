@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -19,6 +19,7 @@ const statuses: { label: string; value?: string }[] = [
 const StatusFilter = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { id: projectId } = useParams();
   const projectParams = searchParams.get("project") || "";
   const statusParams = searchParams.get("status") || "";
 
@@ -36,7 +37,10 @@ const StatusFilter = () => {
 
         const query = params.toString();
         // const query = params.size ? `${params.toString()}` : "0";
-        router.push(`/tickets?${query}`);
+        const url = projectId
+          ? `/projects/${projectId}?${query}`
+          : `/tickets?${query}`;
+        router.push(url);
       }}
     >
       <SelectTrigger className="w-[200px]">
