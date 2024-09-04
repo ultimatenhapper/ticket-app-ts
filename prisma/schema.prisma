@@ -126,6 +126,7 @@ model Project {
   id          Int           @id @default(autoincrement())
   name        String
   description String        @db.Text
+  isFavorite  Boolean       @default(false)
   dueDate     DateTime?     @db.Date
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
