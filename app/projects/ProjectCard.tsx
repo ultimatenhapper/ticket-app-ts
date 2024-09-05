@@ -5,10 +5,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import axios, { AxiosResponse } from "axios";
-import { Star, StarOff, Archive, ArchiveRestore } from "lucide-react";
 
 import { Project } from "@prisma/client";
-// import { IoHeart, IoHeartOutline } from "react-icons/io5";
+import {
+  IoArchive,
+  IoArchiveOutline,
+  IoStar,
+  IoStarOutline,
+} from "react-icons/io5";
 
 interface Props {
   project: Project;
@@ -70,35 +74,6 @@ const ProjectCard = ({ project: initialProject }: Props) => {
             <p className="pt-2 text-lg font-semibold text-gray-50 capitalize mr-2">
               {project.name}
             </p>
-            <button
-              title={
-                project.isFavorite
-                  ? "Remove from favorites"
-                  : "Add to favorites"
-              }
-              className="focus:outline-none ml-2"
-              onClick={toggleFavorite}
-            >
-              {project.isFavorite ? (
-                <Star className="text-yellow-400 fill-yellow-400" size={24} />
-              ) : (
-                <StarOff className="text-gray-300" size={24} />
-              )}
-            </button>
-            <button
-              title={isArchived ? "Activate project" : "Archive project"}
-              className="focus:outline-none ml-2"
-              onClick={archiveProject}
-            >
-              {isArchived ? (
-                <ArchiveRestore
-                  className="text-gray-400 fill-gray-400"
-                  size={24}
-                />
-              ) : (
-                <Archive className="text-red-300 fill-red-300" size={24} />
-              )}
-            </button>
           </div>
 
           <div className="mt-5">
@@ -109,6 +84,36 @@ const ProjectCard = ({ project: initialProject }: Props) => {
               More info
             </Link>
           </div>
+        </div>
+        <div className="flex justify-between p-4">
+          <button
+            title={
+              project.isFavorite ? "Remove from favorites" : "Add to favorites"
+            }
+            onClick={toggleFavorite}
+            className="text-yellow-500 hover:text-yellow-700"
+          >
+            {project.isFavorite ? (
+              <IoStar className="text-yellow-400 fill-yellow-400" size={24} />
+            ) : (
+              <IoStarOutline className="text-gray-300" size={24} />
+            )}
+          </button>
+
+          <button
+            title={isArchived ? "Activate project" : "Archive project"}
+            onClick={archiveProject}
+            className={"text-red-500 hover:text-red-700"}
+          >
+            {isArchived ? (
+              <IoArchiveOutline
+                className="text-gray-400 fill-gray-400"
+                size={24}
+              />
+            ) : (
+              <IoArchive className="text-red-300 fill-red-300" size={24} />
+            )}
+          </button>
         </div>
       </div>
       <p className="text-destructive">{error}</p>
