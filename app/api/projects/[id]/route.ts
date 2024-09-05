@@ -32,12 +32,36 @@ export async function PATCH(request: NextRequest, { params }: Props) {
   if (body?.assignedToUserId) {
     body.assignedToUserId = parseInt(body.assignedToUserId);
   }
-  const updatedProject = await prisma.project.update({
-    where: { id: project.id },
-    data: {
-      ...body,
-    },
+
+  let updatedProject;
+
+  // Use a transaction for atomic updates
+  await prisma.$transaction(async (prisma) => {
+    // Update the project
+    updatedProject = await prisma.project.update({
+      where: { id: project.id },
+      data: {
+        ...body,
+      },
+      // include: { tickets: true }, // Include tickets for the response
+    });
+
+    // If the project is being archived, update all its tickets
+    if (project.status !== updatedProject.status) {
+      await prisma.ticket.updateMany({
+        where: { projectId: project.id },
+        data: {
+          status: updatedProject.status === "ARCHIVED" ? "ARCHIVED" : "OPEN",
+        },
+      });
+    }
   });
+  // const updatedProject = await prisma.project.update({
+  //   where: { id: project.id },
+  //   data: {
+  //     ...body,
+  //   },
+  // });
 
   return NextResponse.json(updatedProject);
 }

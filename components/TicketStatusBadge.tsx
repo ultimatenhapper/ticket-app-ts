@@ -8,11 +8,15 @@ interface Props {
 
 const statusMap: Record<
   Status,
-  { label: string; color: "bg-red-400" | "bg-blue-400" | "bg-green-400" }
+  {
+    label: string;
+    color: "bg-red-400" | "bg-blue-400" | "bg-green-400" | "bg-gray-400";
+  }
 > = {
   OPEN: { label: "Open", color: "bg-red-400" },
   STARTED: { label: "Started", color: "bg-blue-400" },
   CLOSED: { label: "Closed", color: "bg-green-400" },
+  ARCHIVED: { label: "Archived", color: "bg-gray-400" },
 };
 
 const TicketStatusBadge = ({ status }: Props) => {

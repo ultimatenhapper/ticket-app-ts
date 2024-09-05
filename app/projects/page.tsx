@@ -5,18 +5,40 @@ import { ProjectGrid } from "./ProjectGrid";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/options";
 import { IoAddCircle } from "react-icons/io5";
+import ProjectStatusFilter from "@/components/ProjectStatusFilter";
+import { ProjectStatus } from "@prisma/client";
 
-const Projects = async () => {
+export interface SearchParams {
+  status: ProjectStatus;
+}
+
+const Projects = async ({ searchParams }: { searchParams: SearchParams }) => {
   const session = await getServerSession(authOptions);
 
   if (!session) {
     return <p className="text-destructive">Login required</p>;
   }
+  const statuses = Object.values(ProjectStatus);
+  const status = statuses.includes(searchParams.status)
+    ? searchParams.status
+    : undefined;
 
+  let where = {};
+
+  if (status) {
+    where = {
+      status,
+    };
+  } else {
+    where = {
+      NOT: [{ status: "ARCHIVED" as ProjectStatus }],
+    };
+  }
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     include: {
       projects: {
+        where: { ...where },
         orderBy: {
           isFavorite: "desc",
         },
@@ -35,6 +57,9 @@ const Projects = async () => {
         >
           <IoAddCircle size={90} />
         </Link>
+      </div>
+      <div className="flex gap-2">
+        <ProjectStatusFilter />
       </div>
       <div className="flex items-center justify-center mt-8">
         {projects && projects.length > 0 ? (

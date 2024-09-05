@@ -39,7 +39,7 @@ const Tickets = async ({ searchParams }: { searchParams: SearchParams }) => {
     };
   } else {
     where = {
-      NOT: [{ status: "CLOSED" as Status }],
+      NOT: [{ status: "CLOSED" as Status }, { status: "ARCHIVED" as Status }],
     };
   }
 
@@ -51,9 +51,9 @@ const Tickets = async ({ searchParams }: { searchParams: SearchParams }) => {
   // console.log({ projectId });
   const projectIds =
     projectId === 0 ? user?.projects.map((project) => project.id) : [projectId];
-  console.log({ projectIds });
+  // console.log({ projectIds });
   const validProjectIds = projectIds?.filter((id) => !isNaN(id)) || [0];
-  console.log({ validProjectIds });
+  // console.log({ validProjectIds });
   const ticketCount = await prisma.ticket.count({
     where: {
       AND: [

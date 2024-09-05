@@ -1,12 +1,13 @@
 "use client";
 
-import axios, { AxiosResponse } from "axios";
-import { Star, StarOff } from "lucide-react";
-import AssignProject from "@/components/AssignProject";
-import { Project } from "@prisma/client";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+
+import axios, { AxiosResponse } from "axios";
+import { Star, StarOff, Archive, ArchiveRestore } from "lucide-react";
+
+import { Project } from "@prisma/client";
 // import { IoHeart, IoHeartOutline } from "react-icons/io5";
 
 interface Props {
@@ -17,6 +18,9 @@ const ProjectCard = ({ project: initialProject }: Props) => {
   const [project, setProject] = useState(initialProject);
   const [isAssigning, setIsAssigning] = useState(false);
   const [error, setError] = useState("");
+  const [isArchived, setIsArchived] = useState(
+    project.status === "ACTIVE" ? false : true
+  );
   const router = useRouter();
 
   const toggleFavorite = async () => {
@@ -38,6 +42,26 @@ const ProjectCard = ({ project: initialProject }: Props) => {
     setIsAssigning(false);
   };
 
+  const archiveProject = async () => {
+    try {
+      const response: AxiosResponse<Project> = await axios.patch(
+        `/api/projects/${project.id}`,
+        {
+          ...project,
+          status: project.status === "ACTIVE" ? "ARCHIVED" : "ACTIVE",
+        }
+      );
+
+      if (response.data) {
+        setProject(response.data);
+        setIsArchived(project.status === "ACTIVE" ? false : true);
+        router.refresh();
+      }
+    } catch (error) {
+      setError("Unable to archive project");
+    }
+    setIsAssigning(false);
+  };
   return (
     <div className="mx-auto right-0 mt-2 w-60">
       <div className="bg-white rounded overflow-hidden shadow-lg">
@@ -47,6 +71,11 @@ const ProjectCard = ({ project: initialProject }: Props) => {
               {project.name}
             </p>
             <button
+              title={
+                project.isFavorite
+                  ? "Remove from favorites"
+                  : "Add to favorites"
+              }
               className="focus:outline-none ml-2"
               onClick={toggleFavorite}
             >
@@ -54,6 +83,20 @@ const ProjectCard = ({ project: initialProject }: Props) => {
                 <Star className="text-yellow-400 fill-yellow-400" size={24} />
               ) : (
                 <StarOff className="text-gray-300" size={24} />
+              )}
+            </button>
+            <button
+              title={isArchived ? "Activate project" : "Archive project"}
+              className="focus:outline-none ml-2"
+              onClick={archiveProject}
+            >
+              {isArchived ? (
+                <ArchiveRestore
+                  className="text-gray-400 fill-gray-400"
+                  size={24}
+                />
+              ) : (
+                <Archive className="text-red-300 fill-red-300" size={24} />
               )}
             </button>
           </div>
