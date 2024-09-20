@@ -25,50 +25,85 @@ const Pomodoro: React.FC<PomodoroProps> = ({ todo, ticket }) => {
   const [isNotificationOn, setIsNotificationOn] = useState(true);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const startTimeRef = useRef<number | null>(null);
+  const initialTimeLeftRef = useRef<number>(timeLeft);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const router = useRouter();
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    if (isRunning) {
+      startTimeRef.current = Date.now();
+      initialTimeLeftRef.current = timeLeft;
 
-    if (isRunning && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft((prevTime) => prevTime - 1);
+      intervalRef.current = setInterval(() => {
+        const elapsed = Date.now() - (startTimeRef.current || Date.now());
+        const newTimeLeft = Math.max(
+          initialTimeLeftRef.current - Math.floor(elapsed / 1000),
+          0
+        );
+        setTimeLeft(newTimeLeft);
+
+        if (newTimeLeft === 0) {
+          clearInterval(intervalRef.current!);
+          handleTimerEnd();
+        }
       }, 1000);
-    } else if (isRunning && timeLeft === 0) {
-      if (isWorking) {
-        if (isNotificationOn) {
-          playSound();
-        }
-        setIsWorking(false);
-        if (completedSteps < parseInt(todo.steps))
-          setTimeLeft(parseInt(todo.timeResting) * 60);
-      } else {
-        if (isNotificationOn) {
-          playSound();
-        }
-        // Move to next step or finish
-        const nextStep = currentStep + 1;
-        if (nextStep < parseInt(todo.steps)) {
-          setCurrentStep(nextStep);
-          setIsWorking(true);
-          setTimeLeft(todo.timeDuration * 60);
-          setCompletedSteps((prev) => prev + 1);
-          // registerTimeLog(todo.timeDuration * 60);
-          // updateTicketTime();
-        } else {
-          // All steps completed
-          setIsFinished(true);
-          setIsRunning(false);
-          setCompletedSteps((prev) => prev + 1);
-        }
-        registerTimeLog(todo.timeDuration * 60);
-        updateTicketTime();
+    } else {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
       }
     }
 
-    return () => clearInterval(interval);
-  }, [isRunning, timeLeft, isWorking, currentStep, todo, isNotificationOn]);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [isRunning, isWorking]);
+
+  const handleTimerEnd = () => {
+    if (isWorking) {
+      if (isNotificationOn) {
+        playSound();
+      }
+
+      // Increment completedSteps and check if it's the last step
+      setCompletedSteps((prevCompletedSteps) => {
+        const newCompletedSteps = prevCompletedSteps + 1;
+
+        // Register time log and update ticket time
+        registerTimeLog(todo.timeDuration * 60);
+        updateTicketTime();
+
+        if (newCompletedSteps >= parseInt(todo.steps)) {
+          // All steps completed
+          setIsFinished(true);
+          setIsRunning(false);
+        } else {
+          // Not the last step, switch to resting
+          setIsWorking(false);
+          const restingTime = parseInt(todo.timeResting) * 60;
+          setTimeLeft(restingTime);
+          initialTimeLeftRef.current = restingTime;
+          startTimeRef.current = Date.now();
+          // isRunning remains true
+        }
+
+        return newCompletedSteps;
+      });
+    } else {
+      if (isNotificationOn) {
+        playSound();
+      }
+      // Start next working period
+      setIsWorking(true);
+      const workTime = todo.timeDuration * 60;
+      setTimeLeft(workTime);
+      initialTimeLeftRef.current = workTime;
+      startTimeRef.current = Date.now();
+    }
+  };
 
   const toggleTimer = () => {
     if (isFinished) {
@@ -81,7 +116,10 @@ const Pomodoro: React.FC<PomodoroProps> = ({ todo, ticket }) => {
   const resetTimer = () => {
     setIsRunning(false);
     setIsWorking(true);
-    setTimeLeft(todo.timeDuration * 60);
+    const workTime = todo.timeDuration * 60;
+    setTimeLeft(workTime);
+    initialTimeLeftRef.current = workTime;
+    startTimeRef.current = null;
     setCurrentStep(0);
     setCompletedSteps(0);
     setIsFinished(false);
@@ -117,7 +155,7 @@ const Pomodoro: React.FC<PomodoroProps> = ({ todo, ticket }) => {
         await axios.patch("/api/tickets/" + todo.ticketId, {
           status:
             ticket.status !== Status.STARTED ? Status.STARTED : ticket.status,
-          TTS: ticket.TTS + (completedSteps + 1) * todo.timeDuration,
+          TTS: ticket.TTS + completedSteps * todo.timeDuration,
         });
       } catch (error) {
         console.error("Error updating ticket time:", error);
@@ -160,8 +198,8 @@ const Pomodoro: React.FC<PomodoroProps> = ({ todo, ticket }) => {
       {!isFinished ? (
         <>
           <p className="mb-4 text-center text-lg">
-            Step {currentStep + 1} of {parseInt(todo.steps)}
-            {/* <span className="font-semibold">{todo.steps[currentStep]}</span> */}
+            Step {completedSteps + (isWorking ? 1 : 0)} of{" "}
+            {parseInt(todo.steps)}
           </p>
           <div className="mb-6 flex justify-center">
             <CircularProgressbar
@@ -183,7 +221,7 @@ const Pomodoro: React.FC<PomodoroProps> = ({ todo, ticket }) => {
             </Button>
             <Button onClick={resetTimer}>Reset</Button>
             <Button onClick={toggleNotification}>
-              {isNotificationOn ? "Disable Sound" : "Enable Sound   "}
+              {isNotificationOn ? "Disable Sound" : "Enable Sound"}
             </Button>
           </div>
           <div className="mt-6">
