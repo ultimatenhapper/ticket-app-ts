@@ -67,6 +67,11 @@ export async function PATCH(request: NextRequest, { params }: Props) {
 }
 
 export async function DELETE(request: NextRequest, { params }: Props) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
   const project = await prisma.project.findUnique({
     where: { id: parseInt(params.id) },
   });
@@ -80,4 +85,25 @@ export async function DELETE(request: NextRequest, { params }: Props) {
   });
 
   return NextResponse.json({ message: "Project deleted" }, { status: 201 });
+}
+
+export async function GET(request: NextRequest, { params }: Props) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const project = await prisma.project.findUnique({
+    where: { id: parseInt(params.id) },
+    include: {
+      tickets: true,
+    },
+  });
+
+  if (!project) {
+    return NextResponse.json({ error: "Project Not Found" }, { status: 404 });
+  }
+
+  return NextResponse.json(project, { status: 200 });
 }

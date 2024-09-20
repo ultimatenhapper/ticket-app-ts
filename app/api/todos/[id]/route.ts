@@ -14,7 +14,14 @@ export async function PATCH(request: NextRequest, { params }: Props) {
   if (!session) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
-  const body = await request.json();
+  const completeBody = await request.json();
+  // console.log({ body });
+  const { id, ticket, ...body } = completeBody;
+
+  if (body?.projectId) {
+    body.projectId = body.projectId.toString();
+    body.ticketId = body.ticketId.toString();
+  }
   const validation = todoSchema.safeParse(body);
 
   if (!validation.success) {
@@ -30,9 +37,11 @@ export async function PATCH(request: NextRequest, { params }: Props) {
     return NextResponse.json({ error: "Todo Not Found" }, { status: 404 });
   }
 
-  //   if (body?.assignedToUserId) {
-  //     body.assignedToUserId = parseInt(body.assignedToUserId);
-  //   }
+  if (body?.projectId) {
+    body.projectId = parseInt(body.projectId);
+    body.ticketId = parseInt(body.ticketId);
+  }
+
   const updatedTodo = await prisma.todo.update({
     where: { id: todo.id },
     data: {

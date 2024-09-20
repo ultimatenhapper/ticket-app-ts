@@ -58,3 +58,25 @@ export async function PATCH(request: NextRequest, { params }: Props) {
 
   return NextResponse.json(updateUser);
 }
+
+export async function GET(request: NextRequest, { params }: Props) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: params.id },
+    include: {
+      projects: true,
+    },
+  });
+
+  if (!user) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  }
+
+  console.log(user);
+  return NextResponse.json(user);
+}

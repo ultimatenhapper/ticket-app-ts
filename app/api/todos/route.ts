@@ -11,6 +11,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
   const body = await request.json();
+  console.log({ body });
+
+  if (body?.projectId) {
+    body.projectId = body.projectId.toString();
+    body.ticketId = body.ticketId.toString();
+  }
+
   const validation = todoSchema.safeParse(body);
 
   if (!validation.success) {
@@ -18,7 +25,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(validation.error.format(), { status: 400 });
   }
 
-  const { name, description, status } = body;
+  if (body?.projectId) {
+    body.projectId = parseInt(body.projectId);
+    body.ticketId = parseInt(body.ticketId);
+  }
+
+  const {
+    name,
+    description,
+    status,
+    steps,
+    timeDuration,
+    timeResting,
+    projectId,
+    ticketId,
+  } = body;
 
   const todoStatus = status || "PENDING";
 
@@ -27,6 +48,15 @@ export async function POST(request: NextRequest) {
       name,
       description,
       status: todoStatus,
+      steps,
+      timeDuration,
+      timeResting,
+      projectId,
+      ticket: {
+        connect: {
+          id: ticketId,
+        },
+      },
       users: {
         connect: {
           id: session.user.id,

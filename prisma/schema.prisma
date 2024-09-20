@@ -29,6 +29,7 @@ model Ticket {
 
   TTS              Int  @default(0)
   timeLogs         TimeLog[]
+  todo             Todo?
 }
 
 enum Status {
@@ -155,11 +156,16 @@ model Todo {
   name        String
   description String        @db.Text
   status      TodoStatus    @default(PENDING)
-
+  steps       String        @default("3")
+  timeDuration Int          @default(25)
+  timeResting String        @default("5")
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+  projectId   Int 
 
   users       User[]
+  ticket      Ticket        @relation(fields: [ticketId], references: [id])
+  ticketId    Int           @unique
 }
 
 enum TodoStatus {

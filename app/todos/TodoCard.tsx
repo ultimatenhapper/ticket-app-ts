@@ -8,6 +8,7 @@ import {
   IoTrashOutline,
   IoCheckmarkCircleOutline,
   IoCopyOutline,
+  IoPlayCircleOutline,
 } from "react-icons/io5";
 
 import { Todo } from "@prisma/client";
@@ -33,20 +34,28 @@ const TodoCard = ({ todo }: Props) => {
     }
   };
 
-  const handleDuplicate = async () => {
-    try {
-      setIsUpdating(true);
-      setError("");
+  // const handleDuplicate = async () => {
+  //   try {
+  //     setIsUpdating(true);
+  //     setError("");
 
-      await axios.post("/api/todos", { ...todo });
+  //     await axios.post("/api/todos", {
+  //       ...todo,
+  //     });
 
-      setIsUpdating(false);
-      router.refresh();
-    } catch (error) {
-      console.log("TicketForm: error " + error);
-      setError("Unknown Error occurred");
-      setIsUpdating(false);
-    }
+  //     setIsUpdating(false);
+  //     router.refresh();
+  //   } catch (error) {
+  //     console.log("TicketForm: error " + error);
+  //     setError("Unknown Error occurred");
+  //     setIsUpdating(false);
+  //   }
+  // };
+
+  const handlePomodoro = () => {
+    console.log("Handling pomodoro...");
+    router.push(`todos/${todo.id}`);
+    router.refresh();
   };
 
   const handleToggle = async () => {
@@ -101,10 +110,11 @@ const TodoCard = ({ todo }: Props) => {
         </div>
         <div className="flex justify-between p-4">
           <button
-            onClick={handleDuplicate}
+            onClick={handlePomodoro}
             className="text-blue-500 hover:text-blue-700"
+            disabled={todo.status === "DONE"}
           >
-            <IoCopyOutline size={24} />
+            <IoPlayCircleOutline size={24} />
           </button>
 
           <button

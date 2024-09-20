@@ -1,4 +1,4 @@
-import { Todo } from "@prisma/client";
+import { Project, Todo } from "@prisma/client";
 import TodoCard from "./TodoCard";
 
 interface Props {

@@ -1,4 +1,6 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+import ProjectFilter from "@/components/ProjectFilter";
+import prisma from "@/prisma/db";
 import { getServerSession } from "next-auth";
 import dynamic from "next/dynamic";
 
@@ -13,7 +15,20 @@ const NewTodo = async () => {
     return <p className="text-destructive">Login required</p>;
   }
 
-  return <TodoForm />;
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    include: {
+      projects: {},
+    },
+  });
+
+  const projects = user?.projects || [];
+
+  return (
+    <>
+      <TodoForm projects={projects} />
+    </>
+  );
 };
 
 export default NewTodo;

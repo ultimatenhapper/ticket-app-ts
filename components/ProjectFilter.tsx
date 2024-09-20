@@ -27,7 +27,7 @@ const ProjectFilter = ({ projects }: Props) => {
       value: project.id.toString(),
     }));
 
-  metaProjects?.push({ label: "All", value: "0" });
+  metaProjects?.unshift({ label: "All", value: "0" });
 
   return (
     <Select

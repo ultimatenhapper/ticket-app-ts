@@ -48,7 +48,6 @@ const menuItems = [
 const Sidebar = async () => {
   const session = await getServerSession(authOptions);
 
-  console.log({ session });
   const avatarUrl =
     session?.user?.image ||
     "https://tailus.io/sources/blocks/stats-cards/preview/images/second_user.webp";
@@ -66,7 +65,7 @@ const Sidebar = async () => {
               alt="ticketer logo"
               width={300}
               height={300}
-              priority={false}
+              priority
             />
           </Link>
         </div>
