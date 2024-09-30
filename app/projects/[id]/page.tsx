@@ -47,6 +47,7 @@ const ViewProject = async ({ params, searchParams }: Props) => {
     where: { id: parseInt(params.id) },
     include: {
       users: true,
+      tickets: true,
     },
   });
 
@@ -55,6 +56,9 @@ const ViewProject = async ({ params, searchParams }: Props) => {
     include: {
       projects: {
         where: { id: parseInt(params.id) },
+        include: {
+          tickets: true,
+        },
       },
     },
   });
@@ -69,6 +73,7 @@ const ViewProject = async ({ params, searchParams }: Props) => {
       ],
     },
   });
+
   const tickets = await prisma.ticket.findMany({
     where: {
       AND: [
@@ -91,6 +96,7 @@ const ViewProject = async ({ params, searchParams }: Props) => {
 
   const users = await prisma.user.findMany();
   const assignedUsers = project?.users;
+  const allTickets = project?.tickets;
 
   if (!project) {
     return <p className="text-destructive">Project not found!</p>;
@@ -98,7 +104,7 @@ const ViewProject = async ({ params, searchParams }: Props) => {
 
   return (
     <>
-      <ProjectDetail project={project} tickets={tickets} />
+      <ProjectDetail project={project} tickets={allTickets} />
       <div className="flex items-center">
         <AssignProject
           project={project}

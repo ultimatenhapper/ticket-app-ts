@@ -22,7 +22,7 @@ import DeleteButton from "./DeleteButton";
 
 interface Props {
   project: Project;
-  tickets: Ticket[];
+  tickets?: Ticket[];
 }
 
 const ProjectDetail = ({ project, tickets }: Props) => {
@@ -32,7 +32,8 @@ const ProjectDetail = ({ project, tickets }: Props) => {
   const { data: session } = useSession();
 
   const calculateProgress = () => {
-    const closedTickets = tickets.filter(
+    if (!tickets) return 0;
+    const closedTickets = tickets?.filter(
       (ticket) => ticket.status === "CLOSED"
     );
     return tickets.length > 0
@@ -41,7 +42,7 @@ const ProjectDetail = ({ project, tickets }: Props) => {
   };
 
   const calculateTts = () => {
-    const totalTime = tickets.reduce(
+    const totalTime = tickets?.reduce(
       (acc: number, ticket: Ticket) => acc + Number(ticket.TTS),
       0
     );
