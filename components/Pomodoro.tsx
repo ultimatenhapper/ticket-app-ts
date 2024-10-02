@@ -15,7 +15,8 @@ interface PomodoroProps {
   ticket: Ticket;
 }
 
-const Pomodoro: React.FC<PomodoroProps> = ({ todo, ticket }) => {
+const Pomodoro: React.FC<PomodoroProps> = ({ todo, ticket: currentTicket }) => {
+  const [ticket, setTicket] = useState(currentTicket);
   const [currentStep, setCurrentStep] = useState(0);
   const [isWorking, setIsWorking] = useState(true);
   const [timeLeft, setTimeLeft] = useState(todo.timeDuration * 60);
@@ -60,7 +61,7 @@ const Pomodoro: React.FC<PomodoroProps> = ({ todo, ticket }) => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning, isWorking]);
+  }, [isRunning, isWorking, timeLeft]);
 
   const handleTimerEnd = () => {
     if (isWorking) {
@@ -141,24 +142,29 @@ const Pomodoro: React.FC<PomodoroProps> = ({ todo, ticket }) => {
   const registerTimeLog = async (duration: number) => {
     const endTime = new Date();
     const startTime = new Date(endTime.getTime() - duration * 1000);
-    await axios.post("/api/timelogs", {
-      ticketId: todo.ticketId,
-      startTime,
-      endTime,
-      duration: duration, // duration in seconds
-    });
+    try {
+      await axios.post("/api/timelogs", {
+        ticketId: todo.ticketId,
+        startTime,
+        endTime,
+        duration: duration, // duration in seconds
+      });
+    } catch (error) {
+      console.error("Error creating timelog: ", error);
+    }
   };
 
   const updateTicketTime = async () => {
     if (todo.ticketId) {
       try {
-        await axios.patch("/api/tickets/" + todo.ticketId, {
+        const response = await axios.patch("/api/tickets/" + todo.ticketId, {
           status:
             ticket.status !== Status.STARTED ? Status.STARTED : ticket.status,
-          TTS: ticket.TTS + completedSteps * todo.timeDuration,
+          TTS: ticket.TTS + todo.timeDuration * 60,
         });
+        setTicket(response.data);
       } catch (error) {
-        console.error("Error updating ticket time:", error);
+        console.error("Error updating ticket time: ", error);
       }
     }
   };
