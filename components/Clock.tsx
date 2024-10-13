@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Status, Ticket } from "@prisma/client";
+import { useRouter } from "next/navigation";
 
 interface Props {
   ticket: Ticket;
@@ -15,6 +16,8 @@ const Clock = ({ ticket }: Props) => {
   const startTimeRef = useRef<number | null>(null);
   const pausedTimeRef = useRef<number | null>(null);
   const accumulatedTimeRef = useRef<number>(0);
+
+  const router = useRouter();
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -84,6 +87,7 @@ const Clock = ({ ticket }: Props) => {
     accumulatedTimeRef.current = 0;
     startTimeRef.current = null;
     pausedTimeRef.current = null;
+    router.refresh();
   };
 
   const registerTimeLog = async (duration: number) => {
