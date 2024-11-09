@@ -48,11 +48,16 @@ const TimeLogGraph = ({ timeLogs }: Props) => {
       let total = 0;
 
       timeLogs.forEach((log: TimeLog & { title: string }) => {
+        const truncatedTitle =
+          log.title.length > 20
+            ? log.title.substring(0, 25) + "..."
+            : log.title;
+
         const duration = parseFloat(log.duration.toString());
-        if (ticketTimes[log.title]) {
-          ticketTimes[log.title] += duration / 60;
+        if (ticketTimes[truncatedTitle]) {
+          ticketTimes[truncatedTitle] += duration / 60;
         } else {
-          ticketTimes[log.title] = duration / 60;
+          ticketTimes[truncatedTitle] = duration / 60;
         }
         total += duration;
       });
