@@ -104,15 +104,7 @@ const ViewProject = async ({ params, searchParams }: Props) => {
 
   return (
     <>
-      <ProjectDetail project={project} tickets={allTickets} />
-      <div className="flex items-center">
-        <AssignProject
-          project={project}
-          users={users}
-          assignedUsers={assignedUsers}
-        />
-      </div>
-      <div className="mt-10">
+      <div className="m-10">
         <StatusFilter />
         <DataTable
           tickets={tickets}
@@ -122,6 +114,14 @@ const ViewProject = async ({ params, searchParams }: Props) => {
           itemCount={ticketCount}
           pageSize={pageSize}
           currentPage={page}
+        />
+      </div>
+      <ProjectDetail project={project} tickets={allTickets} />
+      <div className="flex items-center">
+        <AssignProject
+          project={project}
+          users={users}
+          assignedUsers={assignedUsers}
         />
       </div>
     </>
