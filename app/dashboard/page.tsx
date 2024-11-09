@@ -65,7 +65,7 @@ const Dashboard = async () => {
       updatedAt: "desc",
     },
     skip: 0,
-    take: 5,
+    take: 10,
     include: {
       assignedToUser: true,
     },

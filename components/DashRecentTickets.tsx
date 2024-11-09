@@ -25,23 +25,21 @@ const DashRecentTickets = ({ tickets }: Props) => {
       <CardHeader>
         <CardTitle>Recently Updated</CardTitle>
         <CardContent>
-          <div className="space-y-8">
-            {tickets
-              ? tickets.map((ticket) => (
-                  <div key={ticket.id} className="flex items-center">
-                    <TicketStatusBadge status={ticket.status} />
-                    <div className="ml-4 space-y-1">
-                      <Link href={`tickets/${ticket.id}`}>
-                        <p>{ticket.title}</p>
-                        <p>{ticket.assignedToUser?.name || "Unassigned"}</p>
-                      </Link>
-                    </div>
-                    <div className="ml-auto font-medium">
-                      <TicketPriority priority={ticket.priority} />
-                    </div>
-                  </div>
-                ))
-              : null}
+          <div className="space-y-8 h-[400px] overflow-y-auto">
+            {tickets?.map((ticket) => (
+              <div key={ticket.id} className="flex items-center">
+                <TicketStatusBadge status={ticket.status} />
+                <div className="ml-4 space-y-1">
+                  <Link href={`tickets/${ticket.id}`}>
+                    <p>{ticket.title}</p>
+                    <p>{ticket.assignedToUser?.name || "Unassigned"}</p>
+                  </Link>
+                </div>
+                <div className="ml-auto font-medium">
+                  <TicketPriority priority={ticket.priority} />
+                </div>
+              </div>
+            ))}
           </div>
         </CardContent>
       </CardHeader>
