@@ -28,6 +28,22 @@ export async function POST(request: NextRequest) {
     assignedToUserId,
   } = body;
 
+  const ticket = await prisma.ticket.findFirst({
+    where: {
+      title: {
+        equals: title,
+        mode: "insensitive", // Case-insensitive search
+      },
+    },
+  });
+
+  if (ticket) {
+    return NextResponse.json(
+      { error: "A ticket with this title already exists" },
+      { status: 400 }
+    );
+  }
+
   const ticketStatus = status || "OPEN";
   const ticketPriority = priority || "LOW";
 

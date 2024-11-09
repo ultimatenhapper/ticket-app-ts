@@ -46,34 +46,39 @@ const TicketForm = ({ projectId, ticket }: Props) => {
   });
 
   async function onSubmit(values: z.infer<typeof ticketSchema>) {
-    console.log({ values });
     try {
       setIsSubmitting(true);
       setError("");
-      // if (values.dueDate) {
-      //   values.dueDate = new Date(values.dueDate);
-      // }
+
       if (ticket) {
         await axios.patch("/api/tickets/" + ticket.id, values);
       } else {
         values.projectId = Number(projectId);
-        // values.assignedToUserId = session?.user.id;
         await axios.post("/api/tickets", values);
       }
+
       setIsSubmitting(false);
 
       if (ticket) {
         router.back();
-        // router.push("/tickets");
       } else {
         router.push(`/projects/${projectId}`);
       }
-      // router.back();
       router.refresh();
     } catch (error) {
-      console.log("TicketForm: error " + error);
-      setError("Unknown Error occurred");
       setIsSubmitting(false);
+      if (axios.isAxiosError(error)) {
+        console.log({ error });
+        setError(
+          error.response?.data?.error ||
+            "Failed to " +
+              (ticket ? "update" : "create") +
+              " ticket. Please try again."
+        );
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+      console.error("TicketForm error:", error);
     }
   }
 
@@ -219,7 +224,11 @@ const TicketForm = ({ projectId, ticket }: Props) => {
         </form>
       </Form>
       {ticket && <TicketTracker ticket={ticket} />}
-      <p className="text-destructive">{error}</p>
+      {error && (
+        <div className="mt-4 p-3 rounded-md bg-destructive/10 text-destructive text-sm">
+          {error}
+        </div>
+      )}
     </div>
   );
 };
