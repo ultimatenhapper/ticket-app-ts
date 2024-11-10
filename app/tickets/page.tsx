@@ -1,3 +1,5 @@
+"use server";
+
 import prisma from "@/prisma/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/options";
@@ -7,10 +9,12 @@ import Pagination from "@/components/Pagination";
 import ProjectFilter from "@/components/ProjectFilter";
 import StatusFilter from "@/components/StatusFilter";
 import { Status, Ticket } from "@prisma/client";
+import TicketSearch from "@/components/TicketSearch";
 
 export interface SearchParams {
   project: string;
   status: Status;
+  search: string;
   page: string;
   orderBy: keyof Ticket;
 }
@@ -26,6 +30,7 @@ const Tickets = async ({ searchParams }: { searchParams: SearchParams }) => {
 
   const orderBy = searchParams.orderBy ? searchParams.orderBy : "createdAt";
   const projectId = searchParams.project ? parseInt(searchParams.project) : 0;
+  const search = searchParams.search ? searchParams.search : "";
   const statuses = Object.values(Status);
   const status = statuses.includes(searchParams.status)
     ? searchParams.status
@@ -77,6 +82,12 @@ const Tickets = async ({ searchParams }: { searchParams: SearchParams }) => {
             in: validProjectIds?.length > 0 ? validProjectIds : null,
           },
         },
+        {
+          title: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
       ],
     },
     include: {
@@ -101,6 +112,7 @@ const Tickets = async ({ searchParams }: { searchParams: SearchParams }) => {
         </Link> */}
         <ProjectFilter projects={user?.projects} />
         <StatusFilter />
+        <TicketSearch />
       </div>
       <DataTable tickets={tickets} searchParams={searchParams} />
       <Pagination

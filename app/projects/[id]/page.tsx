@@ -7,10 +7,18 @@ import DataTable from "@/app/tickets/DataTable";
 import Pagination from "@/components/Pagination";
 import { Status, Ticket } from "@prisma/client";
 import StatusFilter from "@/components/StatusFilter";
+import TicketSearch from "@/components/TicketSearch";
+
+import { Prisma } from "@prisma/client";
 
 interface Props {
   params: { id: string };
-  searchParams: { status: Status; page: string; orderBy: keyof Ticket };
+  searchParams: {
+    status: Status;
+    search: string;
+    page: string;
+    orderBy: keyof Ticket;
+  };
 }
 
 const ViewProject = async ({ params, searchParams }: Props) => {
@@ -26,6 +34,7 @@ const ViewProject = async ({ params, searchParams }: Props) => {
   const orderBy = searchParams.orderBy ? searchParams.orderBy : "createdAt";
   // const projectId = searchParams.project ? parseInt(searchParams.project) : 0;
   const projectId = params.id ? parseInt(params.id) : 0;
+  const search = searchParams.search ? searchParams.search : "";
   const statuses = Object.values(Status);
   const status = statuses.includes(searchParams.status)
     ? searchParams.status
@@ -81,6 +90,12 @@ const ViewProject = async ({ params, searchParams }: Props) => {
         {
           projectId: parseInt(params.id),
         },
+        {
+          title: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
       ],
     },
     include: {
@@ -105,7 +120,10 @@ const ViewProject = async ({ params, searchParams }: Props) => {
   return (
     <>
       <div className="m-10">
-        <StatusFilter />
+        <div className="flex flex-row">
+          <StatusFilter />
+          <TicketSearch />
+        </div>
         <DataTable
           tickets={tickets}
           searchParams={{ ...searchParams, project: params.id }}
