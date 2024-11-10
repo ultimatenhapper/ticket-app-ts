@@ -7,6 +7,7 @@ import DashChart from "@/components/DashChart";
 import DashRecentTickets from "@/components/DashRecentTickets";
 import TimeLogGraph from "@/components/TimeLogGraph";
 import TimeLogPeriodGraph from "@/components/TimeLogPeriodGraph";
+import DashImportantTickets from "@/components/DashImportantTickets";
 
 const Dashboard = async () => {
   const session = await getServerSession(authOptions);
@@ -54,16 +55,29 @@ const Dashboard = async () => {
 
   const projectIds = user.projects.map((project) => project.id);
 
-  const tickets = await prisma.ticket.findMany({
+  const importantTickets = await prisma.ticket.findMany({
     where: {
       projectId: {
         in: projectIds,
       },
       NOT: [{ status: "CLOSED" }],
     },
-    orderBy: {
-      updatedAt: "desc",
+    orderBy: [{ priority: "desc" }, { updatedAt: "desc" }],
+    skip: 0,
+    take: 10,
+    include: {
+      assignedToUser: true,
     },
+  });
+
+  const recentTickets = await prisma.ticket.findMany({
+    where: {
+      projectId: {
+        in: projectIds,
+      },
+      NOT: [{ status: "CLOSED" }],
+    },
+    orderBy: { updatedAt: "desc" },
     skip: 0,
     take: 10,
     include: {
@@ -94,7 +108,10 @@ const Dashboard = async () => {
     <div>
       <div className="grid gap-4 md:grid-cols-2 px-2">
         <div>
-          <DashRecentTickets tickets={tickets} />
+          <DashImportantTickets tickets={importantTickets} />
+        </div>
+        <div>
+          <DashRecentTickets tickets={recentTickets} />
         </div>
         <div>
           <DashChart data={data} />
