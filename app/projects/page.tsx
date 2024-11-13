@@ -7,8 +7,10 @@ import { authOptions } from "../api/auth/[...nextauth]/options";
 import { IoAddCircle } from "react-icons/io5";
 import ProjectStatusFilter from "@/components/ProjectStatusFilter";
 import { ProjectStatus } from "@prisma/client";
+import ProjectSearch from "@/components/ProjectSearch";
 
 export interface SearchParams {
+  search: string;
   status: ProjectStatus;
 }
 
@@ -22,6 +24,7 @@ const Projects = async ({ searchParams }: { searchParams: SearchParams }) => {
   const status = statuses.includes(searchParams.status)
     ? searchParams.status
     : undefined;
+  const search = searchParams.search ? searchParams.search : "";
 
   let where = {};
 
@@ -38,7 +41,17 @@ const Projects = async ({ searchParams }: { searchParams: SearchParams }) => {
     where: { id: session.user.id },
     include: {
       projects: {
-        where: { ...where },
+        where: {
+          AND: [
+            { ...where },
+            {
+              name: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+          ],
+        },
         orderBy: {
           isFavorite: "desc",
         },
@@ -58,8 +71,9 @@ const Projects = async ({ searchParams }: { searchParams: SearchParams }) => {
           <IoAddCircle size={90} />
         </Link>
       </div>
-      <div className="flex gap-2">
+      <div className="flex flex-row gap-2">
         <ProjectStatusFilter />
+        <ProjectSearch />
       </div>
       <div className="flex items-center justify-center mt-8">
         {projects && projects.length > 0 ? (

@@ -114,13 +114,13 @@ const Dashboard = async () => {
           <DashRecentTickets tickets={recentTickets} />
         </div>
         <div>
-          <DashChart data={data} />
-        </div>
-        <div>
           <TimeLogGraph timeLogs={transformedTimeLogs} />
         </div>
         <div>
           <TimeLogPeriodGraph />
+        </div>
+        <div>
+          <DashChart data={data} />
         </div>
       </div>
     </div>

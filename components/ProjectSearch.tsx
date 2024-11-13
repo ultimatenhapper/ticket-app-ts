@@ -20,7 +20,7 @@ const useDebounce = (value: string, delay: number = 300) => {
   return debouncedValue;
 };
 
-const TicketSearch = () => {
+const ProjectSearch = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { id: projectId } = useParams();
@@ -42,9 +42,7 @@ const TicketSearch = () => {
     }
 
     const query = params.toString();
-    const url = projectId
-      ? `/projects/${projectId}?${query}`
-      : `/tickets?${query}`;
+    const url = `/projects?${query}`;
 
     router.push(url);
   }, [debouncedSearch, projectId, router, searchParams]);
@@ -54,14 +52,14 @@ const TicketSearch = () => {
       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
       <Input
         type="search"
-        placeholder="Search tickets..."
+        placeholder="Search projects..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         className="pl-10 w-full"
-        aria-label="Search tickets"
+        aria-label="Search projects"
       />
     </div>
   );
 };
 
-export default TicketSearch;
+export default ProjectSearch;
